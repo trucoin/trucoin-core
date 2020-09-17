@@ -1,0 +1,9 @@
+venv/
+env/
+.idea/
+**/__pycache__/
+env/
+gflags/
+.vscode/
+**.mp4
+node_data.json
