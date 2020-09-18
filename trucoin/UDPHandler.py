@@ -28,7 +28,7 @@ class UDPHandler:
             "synctime": self.synctime,
             "gettime": self.gettime,
             "ping": self.pingpong,
-            "get_space": self.get_disk_space
+            "getspace": self.get_disk_space
         }
 
     @staticmethod
@@ -56,11 +56,10 @@ class UDPHandler:
         redis_client = redis.Redis(host='localhost', port=6379, db=0)
         nodes_map = decode_redis(redis_client.hgetall("nodes_map"))
         for ip_addr, raw_data in nodes_map.items():
-            data = (raw_data)
+            data = json.loads(raw_data)
             print("hi")
             print(data)
-            udpsock.sendto(message.encode('utf-8'),
-                           (ip_addr, data["receiver_port"]))
+            udpsock.sendto(message.encode('utf-8'), (ip_addr, data["receiver_port"]))
         udpsock.close()
 
     def command_handler(self, data):
@@ -116,7 +115,8 @@ class UDPHandler:
     def get_disk_space(self, request=None, response=None):
         if request is not None:
             UDPHandler.broadcastmessage(json.dumps({
-                "command": "get_space"
+                "command": "getspace",
+                "body": {}
             }))
         if response is not None:
             if "command" in response.keys():
