@@ -101,7 +101,7 @@ class Election:
         return
 
     def add_vote(self, vote):
-        self.votes.update(vote)
+        self.votes.update({"node_addr": vote["ip_addr"], "representative": vote["data"]})
 
     def delegates(self):
         votes_count = defaultdict(int)

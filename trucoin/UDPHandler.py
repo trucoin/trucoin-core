@@ -27,7 +27,8 @@ class UDPHandler:
             "gettxbyhash": self.gettxbyhash,
             "synctime": self.synctime,
             "gettime": self.gettime,
-            "ping": self.pingpong
+            "ping": self.pingpong,
+            "get_space": self.get_disk_space
         }
 
     @staticmethod
@@ -72,11 +73,19 @@ class UDPHandler:
             else:
                 self.command_mapping[data['command']](None, None)
 
-    def castvote(self, data):
-        self.broadcastmessage({
-            "command": "voteto",
-            "data": data
-        })
+    def castvote(self, request=None, response=None):
+        if request is not None:
+            self.broadcastmessage({
+                "command": "castvote",
+                "data": request
+            })
+        if response is not None:
+            if "command" in response.keys():
+                context = zmq.Context()
+                socket = context.socket(zmq.REQ)
+                socket.connect("tcp://127.0.0.1:%s" % settings.ELECTION_ZMQ_PORT)
+                socket.send_string(json.dumps(response))
+                msg = socket.recv()
 
     def getchainlength(self, data):
         return self.redis_client.llen("chain")
@@ -102,12 +111,29 @@ class UDPHandler:
             "data": data,
         }))
 
-    def get_disk_space(self):
-        curr_dir = os.getcwd()
-        print(curr_dir)
-        stats = shutil.disk_usage(curr_dir)
-        print("Your free space : ")
-        print(stats.free * 0.00000095367432)
+    def get_disk_space(self, request=None, response=None):
+        if request is not None:
+            UDPHandler.broadcastmessage(json.dumps({
+                "command": "get_space"
+            }))
+        if response is not None:
+            if "command" in response.keys():
+                curr_dir = os.getcwd()
+                print(curr_dir)
+                stats = shutil.disk_usage(curr_dir)
+                print("Your free space in mbs: ")
+                print(stats.free * 0.00000095367432)
+                UDPHandler.sendmessage(json.dumps({
+                    "prev_command": "get_space",
+                    "data" : stats.free
+                }), response["ip_addr"])
+            elif "prev_command" in response.keys():
+                context = zmq.Context()
+                socket = context.socket(zmq.REQ)
+                socket.connect("tcp://127.0.0.1:%s" % settings.STORAGE_ZMQ_PORT)
+                socket.send_string(json.dumps(response))
+                msg = socket.recv()
+                print(msg)
 
     def getallmtxhash(self, request=None, response=None):
         if response is None:
