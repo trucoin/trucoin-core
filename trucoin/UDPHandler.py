@@ -9,7 +9,7 @@ import socket
 import redis
 import time
 from trucoin.TimeServer import TimeServer
-from utils import decode_redis
+from utils import decode_redis, get_own_ip
 
 class UDPHandler:
 
@@ -48,6 +48,7 @@ class UDPHandler:
 
     @staticmethod
     def broadcastmessage(message):
+        own_ip = get_own_ip()
         host = '0.0.0.0'
         port = settings.UDP_BROADCAST_PORT
         udpsock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -56,10 +57,11 @@ class UDPHandler:
         redis_client = redis.Redis(host='localhost', port=6379, db=0)
         nodes_map = decode_redis(redis_client.hgetall("nodes_map"))
         for ip_addr, raw_data in nodes_map.items():
+            if ip_addr == own_ip:
+                continue
             data = json.loads(raw_data)
-            print("hi")
             print(data)
-            udpsock.sendto(message.encode('utf-8'), (ip_addr, data["receiver_port"]))
+            udpsock.sendto(message.encode('utf-8'), (ip_addr, int(data["receiver_port"])))
         udpsock.close()
 
     def command_handler(self, data):
@@ -72,7 +74,7 @@ class UDPHandler:
             if "body" in data.keys():
                 self.command_mapping[data['prev_command']](None, data)
             else:
-                self.command_mapping[data['command']](None, None)
+                self.command_mapping[data['prev_command']](None, None)
 
     def castvote(self, request=None, response=None):
         if request is not None:
@@ -102,15 +104,20 @@ class UDPHandler:
         mm = Mempool()
         return mm.get_tx_by_mindex(data["body"].index)
 
-    def sendtransaction(self, data):
-        tx = Transaction.from_json(data['body'])
-        UDPHandler.broadcastmessage(json.dumps(tx.to_json()))
+    def sendtransaction(self, request=None, response=None):
+        if response is not None:
+            tx = Transaction.from_json(request['body'])
+            UDPHandler.broadcastmessage(json.dumps({
+                "command": "sendtransaction",
+                "body": tx.to_json()
+            }))
 
-    def sendblock(self, data):
-        UDPHandler.broadcastmessage(json.dumps({
-            "command": "addblock",
-            "data": data,
-        }))
+    def sendblock(self, request=None, response=None):
+        if response is not None:
+            UDPHandler.broadcastmessage(json.dumps({
+                "command": "addblock",
+                "body": response["body"],
+            }))
 
     def get_disk_space(self, request=None, response=None):
         if request is not None:
@@ -126,7 +133,7 @@ class UDPHandler:
                 print("Your free space in mbs: ")
                 print(stats.free * 0.00000095367432)
                 UDPHandler.sendmessage(json.dumps({
-                    "prev_command": "get_space",
+                    "prev_command": "getspace",
                     "data" : stats.free
                 }), response["ip_addr"])
             elif "prev_command" in response.keys():

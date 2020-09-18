@@ -6,6 +6,7 @@ import json
 import sys
 from typing import List
 from trucoin.Transaction import Transaction
+from trucoin.TransactionOutput import TransactionOutput
 from collections import Set, Mapping, deque
 
 class Block:
@@ -125,4 +126,20 @@ class Block:
             return
         else:
             # recursive call
-            return self.calculate_merkle_root(new_tran)
+            self.calculate_merkle_root(new_tran)
+
+    def create_coinbase_transaction(self):
+        tx = Transaction()
+        output = TransactionOutput()
+        read_file = open("node_data.json", "r")
+        raw = read_file.read()
+        my_node = json.loads(raw)
+
+        output.value = 50
+        output.address = my_node["address"]
+        output.n = 0
+
+        tx.add_output(output)
+        tx.generate_hash()
+
+        self.add_transaction(tx)

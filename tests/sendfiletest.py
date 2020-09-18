@@ -2,12 +2,13 @@ import socket
 import os
 import json
 import hashlib
+import pickle
 
 SEPARATOR = "<SEPARATOR>"
 BUFFER_SIZE = 1024
 
 # the ip address or hostname of the server, the receiver
-host = "34.74.0.126"
+host = "35.192.6.169"
 # the port, let's use 5001
 port = 5001
 # the name of file we want to send, make sure it exists
