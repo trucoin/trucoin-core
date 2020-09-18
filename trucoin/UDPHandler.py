@@ -2,14 +2,17 @@ from trucoin.Transaction import Transaction
 from trucoin.Mempool import Mempool
 import zmq
 import os
-import shutil 
+import shutil
 import json
 import settings
 import socket
 import redis
 import time
 from trucoin.TimeServer import TimeServer
-from utils import decode_redis, get_own_ip
+from trucoin.BlockChain import BlockChain
+from trucoin.Block import Block
+from utils import decode_redis
+
 
 class UDPHandler:
 
@@ -61,13 +64,14 @@ class UDPHandler:
                 continue
             data = json.loads(raw_data)
             print(data)
-            udpsock.sendto(message.encode('utf-8'), (ip_addr, int(data["receiver_port"])))
+            udpsock.sendto(message.encode('utf-8'),
+                           (ip_addr, data["receiver_port"]))
         udpsock.close()
 
     def command_handler(self, data):
         if "command" in data.keys():
             if "body" in data.keys():
-                self.command_mapping[data['command']](data, None)
+                self.command_mapping[data['command']](None, data)
             else:
                 self.command_mapping[data['command']](None, None)
         elif "prev_command" in data.keys():
@@ -86,7 +90,8 @@ class UDPHandler:
             if "command" in response.keys():
                 context = zmq.Context()
                 socket = context.socket(zmq.REQ)
-                socket.connect("tcp://127.0.0.1:%s" % settings.ELECTION_ZMQ_PORT)
+                socket.connect("tcp://127.0.0.1:%s" %
+                               settings.ELECTION_ZMQ_PORT)
                 socket.send_string(json.dumps(response))
                 msg = socket.recv()
 
@@ -105,19 +110,15 @@ class UDPHandler:
         return mm.get_tx_by_mindex(data["body"].index)
 
     def sendtransaction(self, request=None, response=None):
-        if response is not None:
-            tx = Transaction.from_json(request['body'])
-            UDPHandler.broadcastmessage(json.dumps({
-                "command": "sendtransaction",
-                "body": tx.to_json()
-            }))
+        # tx = Transaction.from_json(data['body'])
+        # UDPHandler.broadcastmessage(json.dumps(tx.to_json()))
+        pass
 
     def sendblock(self, request=None, response=None):
         if response is not None:
-            UDPHandler.broadcastmessage(json.dumps({
-                "command": "addblock",
-                "body": response["body"],
-            }))
+            blkc = BlockChain()
+            blkc.add_block(Block.from_json(response["body"]))
+            blkc.close()
 
     def get_disk_space(self, request=None, response=None):
         if request is not None:
@@ -133,13 +134,14 @@ class UDPHandler:
                 print("Your free space in mbs: ")
                 print(stats.free * 0.00000095367432)
                 UDPHandler.sendmessage(json.dumps({
-                    "prev_command": "getspace",
-                    "data" : stats.free
+                    "prev_command": "get_space",
+                    "data": stats.free
                 }), response["ip_addr"])
             elif "prev_command" in response.keys():
                 context = zmq.Context()
                 socket = context.socket(zmq.REQ)
-                socket.connect("tcp://127.0.0.1:%s" % settings.STORAGE_ZMQ_PORT)
+                socket.connect("tcp://127.0.0.1:%s" %
+                               settings.STORAGE_ZMQ_PORT)
                 socket.send_string(json.dumps(response))
                 msg = socket.recv()
                 print(msg)
