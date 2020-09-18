@@ -11,7 +11,6 @@ from trucoin.Block import Block
 from collections import defaultdict
 from trucoin.UDPHandler import UDPHandler
 
-
 class Election:
     """
         This class holds the nodes election every 30 seconds. A miner is being chosen

@@ -35,8 +35,8 @@ def start():
 def thread(s):
     client_socket, address = s.accept() 
     print(f"[+] {address} is connected.")
-    received = pickle.loads(client_socket.recv())
-    filename = received["file_name"]
+    received = pickle.loads(client_socket.recv(10240))
+    filename = received["filename"]
     filesize = received["filesize"] 
     filetype = received["filetype"]
     filehash = received["filehash"]
