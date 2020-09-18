@@ -9,7 +9,7 @@ import socket
 import redis
 import time
 from trucoin.TimeServer import TimeServer
-
+from utils import decode_redis
 
 class UDPHandler:
 
@@ -54,7 +54,8 @@ class UDPHandler:
         udpsock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         udpsock.bind((host, port))
         redis_client = redis.Redis(host='localhost', port=6379, db=0)
-        for ip_addr, raw_data in redis_client.hgetall("nodes_map"):
+        nodes_map = decode_redis(redis_client.hgetall("nodes_map"))
+        for ip_addr, raw_data in nodes_map.items():
             data = json.loads(raw_data)
             print(data)
             udpsock.sendto(message.encode('utf-8'),
