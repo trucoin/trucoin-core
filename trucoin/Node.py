@@ -5,7 +5,7 @@ import json
 import urllib
 from urllib.error import URLError
 import redis
-from dotscoin.Address import Address
+from trucoin.Address import Address
 from os import path
 
 
