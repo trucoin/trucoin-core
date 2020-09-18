@@ -62,7 +62,8 @@ def thread(s):
         # split and broadcast
         # No. of splits to be made --> n
         print(fileaddr)
-        key, val = file_split(filename)
+        key = file_split(filename)[0]
+        val = file_split(filename)[1]
         file_send(key, filehash, fileaddr, filename, val)
         client_socket.close()
         
@@ -119,7 +120,7 @@ def file_split(filename):
             f.write(file_list[i])
 
     os.remove(filename)
-    return {n: ips}
+    return ([n, ips])
 
 def file_send(n, filehash, fileaddr, file_name, ips):
     stx = StorageTx()

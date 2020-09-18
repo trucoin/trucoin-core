@@ -57,7 +57,8 @@ class UDPHandler:
         nodes_map = decode_redis(redis_client.hgetall("nodes_map"))
         print(nodes_map)
         for ip_addr, raw_data in nodes_map.items():
-            data = json.loads(raw_data)
+            data = (raw_data)
+            print("hi")
             print(data)
             udpsock.sendto(message.encode('utf-8'),
                            (ip_addr, data["receiver_port"]))

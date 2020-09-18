@@ -6,7 +6,6 @@ def get_own_ip():
     try:
         response = urllib.request.urlopen("http://checkip.amazonaws.com/")
         raw = response.read().decode().replace('\n', '')
-        print(raw)
         return raw
     except URLError as e:
         hostname = socket.gethostname()

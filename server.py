@@ -45,7 +45,7 @@ def node_start():
     print("Your current working directory" + curr_dir)
     stx_dir = curr_dir + "/storage/"
     print("Path of storage folder" + stx_dir)
-    if not os.path.exists(stx_dir): 
+    if not os.path.exists(stx_dir):
         os.makedirs(stx_dir)
     node = Node()
     cpu_count()
