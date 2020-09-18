@@ -4,13 +4,13 @@ import json
 import random
 import zmq
 import settings
-from dotscoin.Verification import Verification
-from dotscoin.Transaction import Transaction
-from dotscoin.Block import Block
+from trucoin.Verification import Verification
+from trucoin.Transaction import Transaction
+from trucoin.Block import Block
 from collections import defaultdict
-from dotscoin.UDPHandler import UDPHandler
-from dotscoin.BlockChain import BlockChain
-from dotscoin.TransactionOutput import TransactionOutput
+from trucoin.UDPHandler import UDPHandler
+from trucoin.BlockChain import BlockChain
+from trucoin.TransactionOutput import TransactionOutput
 from utils import decode_redis, get_own_ip
 
 
