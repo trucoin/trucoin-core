@@ -11,7 +11,7 @@ import time
 from trucoin.TimeServer import TimeServer
 from trucoin.BlockChain import BlockChain
 from trucoin.Block import Block
-from utils import decode_redis
+from utils import decode_redis, get_own_ip
 
 
 class UDPHandler:
@@ -65,7 +65,7 @@ class UDPHandler:
             data = json.loads(raw_data)
             print(data)
             udpsock.sendto(message.encode('utf-8'),
-                           (ip_addr, data["receiver_port"]))
+                           (ip_addr, int(data["receiver_port"])))
         udpsock.close()
 
     def command_handler(self, data):
