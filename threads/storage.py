@@ -34,11 +34,11 @@ def thread(s):
     client_socket, address = s.accept() 
     print(f"[+] {address} is connected.")
     received = pickle.loads(client_socket.recv())
-    filename = received.file_name
-    filesize = received.filesize 
-    filetype = received.filetype
-    filehash = received.filehash
-    fileaddr = received.fileaddr
+    filename = received["file_name"]
+    filesize = received["filesize"] 
+    filetype = received["filetype"]
+    filehash = received["filehash"]
+    fileaddr = received["fileaddr"]
 
     # filename, filesize, filetype, filehash, fileaddr = received.split(SEPARATOR)
     print(filetype)
@@ -97,6 +97,7 @@ def file_send(n, filehash, fileaddr, file_name):
     print(fileaddr)
     stx.add_input(filehash, fileaddr)
     part_filename = hashlib.sha256(file_name.encode('utf-8')).hexdigest()
+    # get nodes to send
     recv_hosts = ['15.207.11.83', '34.123.137.113']
     for i in range(0,n):
         host = recv_hosts[i]

@@ -1,6 +1,8 @@
 from trucoin.Transaction import Transaction
 from trucoin.Mempool import Mempool
 import zmq
+import os
+import shutil 
 import json
 import settings
 import socket
@@ -99,6 +101,13 @@ class UDPHandler:
             "command": "addblock",
             "data": data,
         }))
+
+    def get_disk_space(self):
+        curr_dir = os.getcwd()
+        print(curr_dir)
+        stats = shutil.disk_usage(curr_dir)
+        print("Your free space : ")
+        print(stats.free * 0.00000095367432)
 
     def getallmtxhash(self, request=None, response=None):
         if response is None:

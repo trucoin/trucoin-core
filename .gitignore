@@ -7,3 +7,4 @@ gflags/
 .vscode/
 **.mp4
 node_data.json
+storage/

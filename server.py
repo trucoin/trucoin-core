@@ -41,6 +41,11 @@ def run_threads():
     storage_process.start()
 
 def node_start():
+    curr_dir = os.getcwd()
+    print("Your current working directory" + curr_dir)
+    stx_dir = curr_dir + "/storage/"
+    print("Path of storage folder" + stx_dir)
+    os.makedirs(stx_dir)
     node = Node()
     cpu_count()
     run_threads()
