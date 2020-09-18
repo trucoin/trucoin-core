@@ -49,7 +49,7 @@ class Election:
         pipe.execute()
 
     def get_stakes(self):
-        self.stakes_map = decode_redis(redis_client.hgetall("stakes_map"))
+        self.stakes_map = decode_redis(self.redis_client.hgetall("stakes_map"))
 
     def elect_delegate(self):
         total_stake = 0
@@ -83,7 +83,7 @@ class Election:
 
     def delegates(self):
         votes_count = defaultdict(int)
-        for key, val in self.votes.items():
+        for key, val in self.votes_map.items():
             votes_count[val] += 1
         votes_count = sorted(votes_count.items(),
                              key=lambda kv: (kv[1], kv[0]))

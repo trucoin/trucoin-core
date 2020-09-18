@@ -15,6 +15,7 @@ import threading
 import urllib.request
 import settings
 from trucoin.UDPHandler import UDPHandler
+import utils
 
 def bestblock(merkle_roots=[]):
     key_value = dict()
@@ -95,7 +96,6 @@ def mining():
 
 def electionworker():
     elec = Election()
-    elec.get_node_addr()
     dels = worker()
     print(dels)
     is_del = False
