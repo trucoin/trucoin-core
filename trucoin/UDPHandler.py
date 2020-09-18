@@ -73,11 +73,19 @@ class UDPHandler:
             else:
                 self.command_mapping[data['command']](None, None)
 
-    def castvote(self, data):
-        self.broadcastmessage({
-            "command": "voteto",
-            "data": data
-        })
+    def castvote(self, request=None, response=None):
+        if request is not None:
+            self.broadcastmessage({
+                "command": "castvote",
+                "data": request
+            })
+        if response is not None:
+            if "command" in response.keys():
+                context = zmq.Context()
+                socket = context.socket(zmq.REQ)
+                socket.connect("tcp://127.0.0.1:%s" % settings.ELECTION_ZMQ_PORT)
+                socket.send_string(json.dumps(response))
+                msg = socket.recv()
 
     def getchainlength(self, data):
         return self.redis_client.llen("chain")
