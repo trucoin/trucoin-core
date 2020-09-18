@@ -10,4 +10,5 @@ NODE_IP="0.0.0.0"
 
 STORAGE_PATH="storage/"
 TEMP_STORAGE_PATH="storage/"
+STORAGE_ZMQ_PORT=7209
 DNS_SERVERS=["http://dns.dotscoin.com"]

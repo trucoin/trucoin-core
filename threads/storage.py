@@ -1,8 +1,10 @@
 import socket
 import os
+import zmq
 import settings 
 import hashlib
 import math
+import time
 import redis
 import threading
 import json
@@ -60,17 +62,46 @@ def thread(s):
         # split and broadcast
         # No. of splits to be made --> n
         print(fileaddr)
-        file_split(filename,2)
-        file_send(2, filehash, fileaddr, filename)
+        key, val = file_split(filename)
+        file_send(key, filehash, fileaddr, filename, val)
         client_socket.close()
         
     else:
         client_socket.close()
 
-def file_split(filename, n):
+def file_split(filename):
     file_list = []
     filesize = os.path.getsize(filename)
     part_filename = hashlib.sha256(filename.encode('utf-8')).hexdigest()
+
+    # broadcast msg to give size to all nodes
+    udp = UDPHandler()
+    udp.get_disk_space({})
+
+    # get all node's free space
+    ips = []
+    context = zmq.Context()
+    zsocket = context.socket(zmq.REP)
+    zsocket.bind("tcp://127.0.0.1:%s" % settings.STORAGE_ZMQ_PORT)
+    zpoll = zmq.Poller()
+    zpoll.register(zsocket)
+    start_timestamp = time.time()
+    while time.time() - start_timestamp < 8:
+        events = dict(zpoll.poll(1))
+        for key in events:
+            strecv = json.loads(key.recv_string())
+            key.send_string("recieved your free space")
+            if strecv["data"] > filesize:
+                # add ip to array
+                ips.append(strecv["ip_addr"])
+            zsocket.send_string("got someone to store")
+    zpoll.unregister(zsocket)
+    zsocket.close()
+    context.destroy()
+
+    # size of ips
+    n = len(ips)
+
     SPLIT_SIZE = math.ceil(filesize / n)
     with open(filename, "rb") as f:
         i = 0
@@ -88,17 +119,17 @@ def file_split(filename, n):
             f.write(file_list[i])
 
     os.remove(filename)
-    return
+    return {n: ips}
 
-def file_send(n, filehash, fileaddr, file_name):
+def file_send(n, filehash, fileaddr, file_name, ips):
     stx = StorageTx()
     mem = Mempool()
-    # udp = UDPHandler()
+    udp = UDPHandler()
     print(fileaddr)
     stx.add_input(filehash, fileaddr)
     part_filename = hashlib.sha256(file_name.encode('utf-8')).hexdigest()
-    # get nodes to send
-    recv_hosts = ['15.207.11.83', '34.123.137.113']
+
+    recv_hosts = ips
     for i in range(0,n):
         host = recv_hosts[i]
         port = 5001
@@ -136,7 +167,7 @@ def file_send(n, filehash, fileaddr, file_name):
         
     stx.gen_tx_hash()
     mem.add_transaction(stx)
-    # udp.broadcastmessage(json.dumps(stx.to_json()))
+    udp.broadcastmessage(json.dumps(stx.to_json()))
 
 def get_hash(filename, parts):
     hash_ar = []
