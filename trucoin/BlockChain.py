@@ -25,6 +25,16 @@ class BlockChain:
         else:
             return
 
+    def get_block_by_hash(self, hash: str) -> Block:
+        chain_length = self.redis_client.llen('chain')
+        while chain_length > 0:
+            block = Block.from_json(json.loads(self.redis_client.lindex('chain', chain_length - 1).decode('utf-8')))
+            if block.hash == hash:
+                return block
+            chain_length -= 1
+
+        return
+
     def get_length(self) -> int:
         return self.redis_client.llen("chain")
 

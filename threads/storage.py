@@ -27,10 +27,7 @@ def start():
     print(f"[*] Listening as {SERVER_HOST}:{SERVER_PORT}")
     t = threading.Thread(target=thread(s))
     t.start()
-    t2 = threading.Thread(target=thread(s))
-    t2.start()
     t.join()
-    t2.join()
 
 def thread(s):
     client_socket, address = s.accept() 

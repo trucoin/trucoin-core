@@ -10,6 +10,7 @@ if __name__ == '__main__':
             {
                 "previous_tx": "oihrsgiohsioj9ih05i0yu9u59y8o4yu54h",
                 "index": 3,
+                "address": "esfgdghshhh",
                 "scriptSig": ["segbikldrih95euy9u4509uyh90e9p4ujy"],
                 "verifying_key": ["jlbuigfuiga89y89egyg8w4oig8gw"]
             }

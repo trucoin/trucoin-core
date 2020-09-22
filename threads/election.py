@@ -16,6 +16,7 @@ import urllib.request
 import settings
 from trucoin.UDPHandler import UDPHandler
 import utils
+from trucoin.Mining import Mining
 
 def bestblock(merkle_roots=[]):
     key_value = dict()
@@ -95,15 +96,25 @@ def mining():
         return
 
 def electionworker():
-    elec = Election()
-    dels = worker()
-    print(dels)
-    is_del = False
-    if dels.count(elec.this_node_addr) > 0:
-        is_del = True
-        mining()
-    if is_del == False:
-        add_block_nondel()
+    # elec = Election()
+    # dels = worker()
+    # print(dels)
+    # is_del = False
+    # if dels.count(elec.this_node_addr) > 0:
+    #     is_del = True
+    #     mining()
+    # if is_del == False:
+    #     add_block_nondel()
+    while True:
+        mining = Mining()
+        block = mining.create_block()
+        if block is not None:
+            UDPHandler.broadcastmessage(json.dumps({
+                "command": "sendblock",
+                "body": block.to_json()
+            }))
+        time.sleep(30)
+
 
 def add_block_nondel():
     context = zmq.Context()
@@ -144,6 +155,6 @@ def run_thread():
     t = threading.Thread(target=electionworker)
     t.start()
     t.join()
-    t = threading.Thread(target=add_block_nondel)
-    t.start()
-    t.join()
+    # t = threading.Thread(target=add_block_nondel)
+    # t.start()
+    # t.join()

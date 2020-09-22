@@ -22,7 +22,8 @@ class RPC:
             'gettxsbyaddress': self.gettxsbyaddress,
             'ping': self.pingpong,
             "getchainlength": self.getchainlength,
-            "getallutxobyaddress": self.getallutxobyaddress
+            "getallutxobyaddress": self.getallutxobyaddress,
+            "getblockbyhash": self.getblockbyhash
         }
 
     def handlecommand(self, data):
@@ -125,7 +126,20 @@ class RPC:
         utxos_tuple = blkc.get_utxos_by_addr(data)
         response = [{"tx": utxo[0], "index": utxo[1], "amount": utxo[2]}
                     for utxo in utxos_tuple]
-
+        blkc.close()
         return json.dumps({
             "utxos": response
         })
+
+    def getblockbyhash(self, data=None):
+        blkc = BlockChain()
+        block = blkc.get_block_by_hash(data)
+
+        if block is not None:
+            return json.dumps({
+                "block": block.to_json()
+            })
+        else:
+            return json.dumps({
+                "error": "Block not found"
+            })

@@ -2,14 +2,17 @@ from trucoin.Transaction import Transaction
 from trucoin.Mempool import Mempool
 import zmq
 import os
-import shutil 
+import shutil
 import json
 import settings
 import socket
 import redis
 import time
 from trucoin.TimeServer import TimeServer
-from utils import decode_redis
+from trucoin.BlockChain import BlockChain
+from trucoin.Block import Block
+from utils import decode_redis, get_own_ip
+
 
 class UDPHandler:
 
@@ -28,7 +31,7 @@ class UDPHandler:
             "synctime": self.synctime,
             "gettime": self.gettime,
             "ping": self.pingpong,
-            "get_space": self.get_disk_space
+            "getspace": self.get_disk_space
         }
 
     @staticmethod
@@ -48,6 +51,7 @@ class UDPHandler:
 
     @staticmethod
     def broadcastmessage(message):
+        own_ip = get_own_ip()
         host = '0.0.0.0'
         port = settings.UDP_BROADCAST_PORT
         udpsock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -57,24 +61,25 @@ class UDPHandler:
         nodes_map = decode_redis(redis_client.hgetall("nodes_map"))
         print(nodes_map)
         for ip_addr, raw_data in nodes_map.items():
-            data = (raw_data)
-            print("hi")
+            if ip_addr == own_ip:
+                continue
+            data = json.loads(raw_data)
             print(data)
             udpsock.sendto(message.encode('utf-8'),
-                           (ip_addr, data["receiver_port"]))
+                           (ip_addr, int(data["receiver_port"])))
         udpsock.close()
 
     def command_handler(self, data):
         if "command" in data.keys():
             if "body" in data.keys():
-                self.command_mapping[data['command']](data, None)
+                self.command_mapping[data['command']](None, data)
             else:
                 self.command_mapping[data['command']](None, None)
         elif "prev_command" in data.keys():
             if "body" in data.keys():
                 self.command_mapping[data['prev_command']](None, data)
             else:
-                self.command_mapping[data['command']](None, None)
+                self.command_mapping[data['prev_command']](None, None)
 
     def castvote(self, request=None, response=None):
         if request is not None:
@@ -86,7 +91,8 @@ class UDPHandler:
             if "command" in response.keys():
                 context = zmq.Context()
                 socket = context.socket(zmq.REQ)
-                socket.connect("tcp://127.0.0.1:%s" % settings.ELECTION_ZMQ_PORT)
+                socket.connect("tcp://127.0.0.1:%s" %
+                               settings.ELECTION_ZMQ_PORT)
                 socket.send_string(json.dumps(response))
                 msg = socket.recv()
 
@@ -104,21 +110,22 @@ class UDPHandler:
         mm = Mempool()
         return mm.get_tx_by_mindex(data["body"].index)
 
-    def sendtransaction(self, data):
-        tx = Transaction.from_json(data['body'])
-        UDPHandler.broadcastmessage(json.dumps(tx.to_json()))
+    def sendtransaction(self, request=None, response=None):
+        # tx = Transaction.from_json(data['body'])
+        # UDPHandler.broadcastmessage(json.dumps(tx.to_json()))
+        pass
 
-    def sendblock(self, data):
-        UDPHandler.broadcastmessage(json.dumps({
-            "command": "addblock",
-            "data": data,
-        }))
+    def sendblock(self, request=None, response=None):
+        if response is not None:
+            blkc = BlockChain()
+            blkc.add_block(Block.from_json(response["body"]))
+            blkc.close()
 
     def get_disk_space(self, request=None, response=None):
         if request is not None:
             UDPHandler.broadcastmessage(json.dumps({
-                "command": "get_space",
-                "body": {},
+                "command": "getspace",
+                "body": {}
             }))
         if response is not None:
             if "command" in response.keys():
@@ -129,12 +136,13 @@ class UDPHandler:
                 print(stats.free * 0.00000095367432)
                 UDPHandler.sendmessage(json.dumps({
                     "prev_command": "get_space",
-                    "data" : stats.free
+                    "data": stats.free
                 }), response["ip_addr"])
             elif "prev_command" in response.keys():
                 context = zmq.Context()
                 socket = context.socket(zmq.REQ)
-                socket.connect("tcp://127.0.0.1:%s" % settings.STORAGE_ZMQ_PORT)
+                socket.connect("tcp://127.0.0.1:%s" %
+                               settings.STORAGE_ZMQ_PORT)
                 socket.send_string(json.dumps(response))
                 msg = socket.recv()
                 print(msg)
