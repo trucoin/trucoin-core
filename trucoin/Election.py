@@ -22,7 +22,7 @@ class Election:
     def __init__(self):
         self.primary_representatives = dict()
         self.blockchain = BlockChain()
-        self.fund_addr = ""
+        self.fund_addr = "12345"
         self.redis_client = redis.Redis(host='localhost', port=6379, db=0)
         self.redis_client.hmset('fund '+self.fund_addr, {'total fund': 00})
         self.this_node_addr = get_own_ip()
