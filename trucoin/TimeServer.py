@@ -1,7 +1,6 @@
 from datetime import datetime
 import sys
 
-
 class TimeServer:
     def linux_set_time(self, time_tuple):
         import subprocess

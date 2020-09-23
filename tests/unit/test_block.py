@@ -27,6 +27,7 @@ class TestBlock(unittest.TestCase):
 
         self.assertNotEqual(initial_merkle_root, final_merkle_root)
 
+    # complete block test in addblock.py
 
 if __name__ == '__main__':
     unittest.main()

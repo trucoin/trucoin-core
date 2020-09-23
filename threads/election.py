@@ -68,6 +68,9 @@ def mining():
 
     # Transaction verification 
     blk = Block()
+    blk.create_coinbase_transaction()
+    blk.add_previous_block()
+
     for i in range(0, elec.redis_client.llen("mempool")):
         tx = elec.redis_client.lindex('mempool', i).decode('utf-8')
         if tx == None:

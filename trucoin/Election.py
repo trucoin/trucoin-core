@@ -13,7 +13,6 @@ from trucoin.BlockChain import BlockChain
 from trucoin.TransactionOutput import TransactionOutput
 from utils import decode_redis, get_own_ip
 
-
 class Election:
     """
         This class holds the nodes election every 30 seconds. A miner is being chosen
@@ -38,7 +37,7 @@ class Election:
         self.fund_addr = data["address"]
 
     def scan_election_fund(self):
-        txs = blockchain.get_txs_by_addr(self.fund_addr)
+        txs = self.blockchain.get_txs_by_addr(self.fund_addr)
         pipe = self.redis_client.pipeline()
         for tx in txs:
             for output in tx.outputs:
@@ -79,7 +78,7 @@ class Election:
         return
 
     def add_vote(self, vote):
-        self.votes.update(vote)
+        self.votes_map.update(vote)
 
     def delegates(self):
         votes_count = defaultdict(int)
