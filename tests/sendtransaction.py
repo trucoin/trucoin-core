@@ -27,7 +27,7 @@ if __name__ == '__main__':
         'is_coinbase': False
     }
 
-    url = "http://localhost:8000/"
+    url = "http://34.75.37.203:8000/"
     headers = {
         'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNTk4Mjk4ODIyLCJqdGkiOiJkNDQ1MDZkNmJjOGY0NjQxYWJlNmQyMzI2NzI5OTI5MCIsInVzZXJfaWQiOjF9.zk3CUn8XXvhZE0WsARUzr2IogPfB3XPzAp68zgJ7Kus',
         'Content-Type': 'application/json'

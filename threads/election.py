@@ -96,15 +96,15 @@ def mining():
         return
 
 def electionworker():
-    # elec = Election()
-    # dels = worker()
-    # print(dels)
-    # is_del = False
-    # if dels.count(elec.this_node_addr) > 0:
-    #     is_del = True
-    #     mining()
-    # if is_del == False:
-    #     add_block_nondel()
+    elec = Election()
+    dels = worker()
+    print(dels)
+    is_del = False
+    if dels.count(elec.this_node_addr) > 0:
+        is_del = True
+        mining()
+    if is_del == False:
+        add_block_nondel()
     while True:
         mining = Mining()
         block = mining.create_block()

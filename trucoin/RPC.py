@@ -45,7 +45,9 @@ class RPC:
             **data
         })
         mempool = Mempool()
+        print("adding to mempool")
         mempool.add_transaction(tx)
+        
         UDPHandler.broadcastmessage(json.dumps({
             "command": "sendtransaction",
             "tx": tx.to_json()

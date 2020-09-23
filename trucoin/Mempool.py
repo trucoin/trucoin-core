@@ -17,7 +17,9 @@ class Mempool:
         Returns:
             boolean: A boolean result to show if the transaction is added successfully or not.
         """
+        print("adding")
         self.redis_client.rpush("mempool", json.dumps(val.to_json()))
+        print("added tx")
         return True
     
     def get_len(self):
