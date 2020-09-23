@@ -78,8 +78,10 @@ if __name__ == "__main__":
 
     for i in range(5):
         block = Block()
+        block.add_previous_block()
         block.add_transaction(create_fake_transaction(
             global_addresses[random.randint(0, 9)]))
+        block.create_coinbase_transaction()
         block.calculate_merkle_root()
         block.compute_hash()
         block.calcalute_block_size()

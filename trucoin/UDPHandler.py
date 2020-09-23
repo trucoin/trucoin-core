@@ -59,6 +59,7 @@ class UDPHandler:
         udpsock.bind((host, port))
         redis_client = redis.Redis(host='localhost', port=6379, db=0)
         nodes_map = decode_redis(redis_client.hgetall("nodes_map"))
+        print(nodes_map)
         for ip_addr, raw_data in nodes_map.items():
             if ip_addr == own_ip:
                 continue

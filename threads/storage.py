@@ -74,7 +74,7 @@ def file_split(filename):
 
     # broadcast msg to give size to all nodes
     udp = UDPHandler()
-    udp.get_disk_space({})
+    udp.get_disk_space(json.dumps({}))
 
     # get all node's free space
     ips = []

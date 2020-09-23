@@ -37,6 +37,7 @@ class Node:
                 print(result)
 
     def dns_fetch(self):
+        own_ip = get_own_ip()
         redis_client = redis.Redis(host='localhost', port=6379, db=0)
         pipe = redis_client.pipeline()
         for url in settings.DNS_SERVERS:
@@ -48,6 +49,8 @@ class Node:
                 raw = response.read()
                 result = json.loads(raw.decode("utf-8"))
                 for value in result["nodes"]:
+                    if value["ip_addr"] == own_ip:
+                        continue
                     pipe.hset(
                         "nodes_map", value["ip_addr"], json.dumps(value))
         pipe.execute()
