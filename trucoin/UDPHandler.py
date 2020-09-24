@@ -116,6 +116,13 @@ class UDPHandler:
         pass
 
     def sendblock(self, request=None, response=None):
+        print(request)
+        print(response)
+        if request is not None:
+            UDPHandler.broadcastmessage(json.dumps({
+                "command": "sendblock",
+                "body": request
+            }))
         if response is not None:
             blkc = BlockChain()
             blkc.add_block(Block.from_json(response["body"]))

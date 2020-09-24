@@ -1,6 +1,6 @@
 import socket
 from urllib.error import URLError
-import urllib
+import urllib.request
 
 def get_own_ip():
     try:

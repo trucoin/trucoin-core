@@ -81,7 +81,7 @@ if __name__ == "__main__":
         "size": 1949
     }))
 
-    for i in range(1):
+    for i in range(0):
         block = Block()
         block.add_previous_block()
         block.add_transaction(create_fake_transaction(
@@ -90,6 +90,6 @@ if __name__ == "__main__":
         block.calculate_merkle_root()
         block.compute_hash()
         block.calcalute_block_size()
-   
         redis_client.rpush("chain", json.dumps(block.to_json()))
-        UDPHandler.sendblock(block)
+        print(block.to_json())
+        UDPHandler.sendblock(block.to_json())
