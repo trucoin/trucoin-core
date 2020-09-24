@@ -7,10 +7,15 @@ from trucoin.Transaction import Transaction
 from trucoin.TransactionInput import TransactionInput
 from trucoin.TransactionOutput import TransactionOutput
 from trucoin.Address import Address
+from trucoin.Node import Node
+from trucoin.UDPHandler import UDPHandler
 
 global_addresses = []
+no = Node()
+myno = no.load_node_json()
+addr = myno["address"]
 add_data = {
-    "address": "1d3f347aada53547142da8edea5e0019e6ef31bb15",
+    "address": addr,
     "vk": "-----BEGIN PUBLIC KEY-----\nMEkwEwYHKoZIzj0CAQYIKoZIzj0DAQEDMgAEHxzkpgh/lqgd1/rb7d+D+srhlhzG\ncOAveBQafVnHkffNR2aCiFHVQZKzhyO7iC/p\n-----END PUBLIC KEY-----\n",
     "sk": "-----BEGIN EC PRIVATE KEY-----\nMF8CAQEEGKtkXJ8xlejSSOl4mzNTYiXmb70wRByW1aAKBggqhkjOPQMBAaE0AzIA\nBB8c5KYIf5aoHdf62+3fg/rK4ZYcxnDgL3gUGn1Zx5H3zUdmgohR1UGSs4cju4gv\n6Q==\n-----END EC PRIVATE KEY-----\n"
 }
@@ -32,7 +37,7 @@ def create_fake_transaction(address: Address):
         'verifying_key': [add_data["vk"]]
     }))
     tmp_tx.outputs.append(TransactionOutput.from_json({
-        'address': "yikgyyf67rr68t887tfc",
+        'address': "12345",
         'value': 25,
         'n': 0
     }))
@@ -76,7 +81,7 @@ if __name__ == "__main__":
         "size": 1949
     }))
 
-    for i in range(5):
+    for i in range(1):
         block = Block()
         block.add_previous_block()
         block.add_transaction(create_fake_transaction(
@@ -87,3 +92,4 @@ if __name__ == "__main__":
         block.calcalute_block_size()
    
         redis_client.rpush("chain", json.dumps(block.to_json()))
+        UDPHandler.sendblock(block)

@@ -31,24 +31,35 @@ def cpu_count():
         exit()
 
 def run_threads():
+    """ running multiple processes """
+    # RPC
     rpc=multiprocessing.Process(target=rpc_receive)
     rpc.start()
+    # Receiver
     receiver=multiprocessing.Process(target=broadcast_receive)
     receiver.start()
+    # Election & Mining
     election_process = multiprocessing.Process(target=run_thread)
     election_process.start()
+    # Storage 
     storage_process = multiprocessing.Process(target=start)
     storage_process.start()
 
 def node_start():
+    """ root method """
+
+    # Storage folder creation
     curr_dir = os.getcwd()
     print("Your current working directory" + curr_dir)
     stx_dir = curr_dir + "/storage/"
     print("Path of storage folder" + stx_dir)
     if not os.path.exists(stx_dir):
         os.makedirs(stx_dir)
+    # initialize node with DNS
     node = Node()
+    # get cpu data
     cpu_count()
+    # start processes
     run_threads()
     
 if __name__ == '__main__':

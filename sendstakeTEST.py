@@ -1,8 +1,12 @@
 import requests
 import json
 import time
+from trucoin.Node import Node
 
 if __name__ == '__main__':
+    no = Node()
+    myno = no.load_node_json()
+    addr = myno["address"]
     tx = {
         'timestamp': time.time(),
         'version': '0.0.2',
@@ -10,7 +14,7 @@ if __name__ == '__main__':
             {
                 "previous_tx": "oihrsgiohsioj9ih05i0yu9u59y8o4yu54h",
                 "index": 3,
-                "address": "iuyfvuyfguyifguyff687",
+                "address": addr,
                 "scriptSig": ["segbikldrih95euy9u4509uyh90e9p4ujy"],
                 "verifying_key": ["jlbuigfuiga89y89egyg8w4oig8gw"]
             }
