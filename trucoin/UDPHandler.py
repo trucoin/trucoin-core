@@ -120,7 +120,7 @@ class UDPHandler:
         print(request)
         if request is not None:
             UDPHandler.broadcastmessage(json.dumps({
-                "command": "sendblock",
+                "prev_command": "sendblock",
                 "body": request
             }))
         if response is not None:
