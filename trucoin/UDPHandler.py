@@ -90,10 +90,11 @@ class UDPHandler:
         if response is not None:
             if "command" in response.keys():
                 context = zmq.Context()
+                print("recieving vote 50%")
                 socket = context.socket(zmq.REQ)
                 socket.connect("tcp://127.0.0.1:%s" %
                                settings.ELECTION_ZMQ_PORT)
-                print("recieving vote")
+                print("recieving vote 100%")
                 socket.send_string(json.dumps(response))
                 msg = socket.recv()
                 print(msg)
