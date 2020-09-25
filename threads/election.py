@@ -62,9 +62,10 @@ def worker():
 
 
 def mining():
+    print("Into mining process")
     elec = Election()
-    if elec.redis_client.llen("mempool") == 0:
-        return
+    # if elec.redis_client.llen("mempool") == 0:
+    #     return
 
     # Transaction verification 
     blk = Block()
@@ -89,12 +90,13 @@ def mining():
     # add block
     blkChain = BlockChain()
     blkChain.add_block(block)
+    print("block added to my blockchain")
 
     # full blockchain verify
     # full_verify_message = elec.verification.full_chain_verify()
     # if full_verify_message == "verified":
         # braodcast the block you made
-    print("sending block made by election")
+    print("sending block made by me")
     UDPHandler.sendblock(block)
     # else:
     #     return
@@ -105,10 +107,13 @@ def electionworker():
     print(dels)
     is_del = False
     if dels.count(elec.this_node_addr) > 0:
+        print("I am a delegate")
         is_del = True
     if is_del == False:
+        print("running non-del")
         add_block_nondel()
     else:
+        print("mining running")
         mining()
     # while True:
     #     mining = Mining()
