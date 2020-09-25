@@ -85,7 +85,7 @@ def mining():
     # create block
     blk.compute_hash()
     blk.calculate_merkle_root()
-    block = blk.to_json()
+    block = blk
 
     # add block
     blkChain = BlockChain()
@@ -97,7 +97,8 @@ def mining():
     # if full_verify_message == "verified":
         # braodcast the block you made
     print("sending block made by me")
-    UDPHandler.sendblock(block)
+    udphandler = UDPHandler()
+    udphandler.sendblock(block.to_json())
     # else:
     #     return
 
