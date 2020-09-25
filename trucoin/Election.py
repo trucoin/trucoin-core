@@ -71,8 +71,9 @@ class Election:
         self.votes_map[self.this_node_addr] = select
         print("This nodes vote :")
         print(select)
-        UDPHandler.castvote(json.dumps(
-            {"node_addr": self.this_node_addr, "representative": select}))
+        udphandler = UDPHandler()
+        udphandler.castvote(
+            {"node_addr": self.this_node_addr, "representative": select})
 
     def vote_to(self):
         # Broadcast the selected node to vote

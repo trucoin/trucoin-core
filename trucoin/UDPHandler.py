@@ -83,11 +83,10 @@ class UDPHandler:
 
     def castvote(self, request=None, response=None):
         if request is not None:
-            print("casting vote")
-            self.broadcastmessage({
+            self.broadcastmessage(json.dumps({
                 "command": "castvote",
                 "data": request
-            })
+            }))
         if response is not None:
             if "command" in response.keys():
                 context = zmq.Context()
