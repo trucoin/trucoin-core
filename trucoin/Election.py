@@ -60,7 +60,11 @@ class Election:
                 arr.append(key)
         if total_stake == 0:
             return
-        select = arr[random.randint(0, total_stake-1)]
+        while True:
+            select = arr[random.randint(0, total_stake-1)]
+            if (select != self.this_node_addr):
+                break     
+
         self.votes_map[self.this_node_addr] = select
         print("This nodes vote :")
         print(select)
