@@ -29,7 +29,7 @@ class Election:
         self.stakes_map = dict()
         self.votes_map = dict()
         self.verification = Verification()
-        self.load_election_fund_details()
+        # self.load_election_fund_details()
 
     def load_election_fund_details(self):
         f = open('electionfund.json', 'r')
@@ -49,6 +49,7 @@ class Election:
 
     def get_stakes(self):
         self.stakes_map = decode_redis(self.redis_client.hgetall("stakes_map"))
+        print(self.stakes_map)
 
     def elect_delegate(self):
         total_stake = 0
@@ -66,15 +67,15 @@ class Election:
 
     def vote_to(self):
         # Broadcast the selected node to vote
-        # UDPHandler.broadcastmessage(json.dumps(
-        #     {'data': {"voter_addr": self.this_node_addr, "voted_addr": select}, 'command': 'voteto'}))
-        # context = zmq.Context()
-        # z2socket = context.socket(zmq.REQ)
-        # z2socket.connect("tcp://127.0.0.1:%s" % settings.BROADCAST_ZMQ_PORT)
-        # z2socket.send_string(json.dumps({'data':{"voter_addr":self.this_node_addr, "voted_addr":select},'command': 'voteto'}))
-        # message = z2socket.recv()
-        # print(message)
-        # z2socket.close()
+        UDPHandler.broadcastmessage(json.dumps(
+            {'data': {"voter_addr": self.this_node_addr, "voted_addr": select}, 'command': 'voteto'}))
+        context = zmq.Context()
+        z2socket = context.socket(zmq.REQ)
+        z2socket.connect("tcp://0.0.0.0:%s" % settings.BROADCAST_ZMQ_PORT)
+        z2socket.send_string(json.dumps({'data':{"voter_addr":self.this_node_addr, "voted_addr":select},'command': 'voteto'}))
+        message = z2socket.recv()
+        print(message)
+        z2socket.close()
         return
 
     def add_vote(self, vote):

@@ -38,9 +38,9 @@ def bestblock(merkle_roots=[]):
 
 def worker():
     elec = Election()
-    # elec.election_fund()
+    elec.scan_election_fund()
     elec.get_stakes()
-    elec.vote_to()
+    elec.elect_delegate()
     print("vote sent and waiting for other's votes")
     context = zmq.Context()
     zsocket = context.socket(zmq.REP)
@@ -48,7 +48,7 @@ def worker():
     zpoll = zmq.Poller()
     zpoll.register(zsocket)
     start_timestamp = time.time()
-    while time.time() - start_timestamp < 25:
+    while time.time() - start_timestamp < 5:
         events = dict(zpoll.poll(1))
         for key in events:
             vote = json.loads(key.recv_string())
@@ -91,12 +91,13 @@ def mining():
     blkChain.add_block(block)
 
     # full blockchain verify
-    full_verify_message = elec.verification.full_chain_verify()
-    if full_verify_message == "verified":
+    # full_verify_message = elec.verification.full_chain_verify()
+    # if full_verify_message == "verified":
         # braodcast the block you made
-        UDPHandler.sendblock(block)
-    else:
-        return
+    print("sending block made by election")
+    UDPHandler.sendblock(block)
+    # else:
+    #     return
 
 def electionworker():
     elec = Election()
