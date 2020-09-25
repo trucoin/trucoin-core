@@ -106,9 +106,14 @@ def electionworker():
     dels = worker()
     print(dels)
     is_del = False
-    if dels.count(elec.this_node_addr) > 0:
-        print("I am a delegate")
-        is_del = True
+    # if dels.count(elec.this_node_addr) > 0:
+    #     print("I am a delegate")
+    #     is_del = True
+    for k, v in dels:
+        if k == elec.this_node_addr:
+            print("I am a delegate")
+            is_del = True
+        
     if is_del == False:
         print("running non-del")
         add_block_nondel()
