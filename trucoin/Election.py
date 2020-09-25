@@ -11,7 +11,8 @@ from collections import defaultdict
 from trucoin.UDPHandler import UDPHandler
 from trucoin.BlockChain import BlockChain
 from trucoin.TransactionOutput import TransactionOutput
-from utils import decode_redis, get_own_ip
+from utils import decode_redis, get_own_ip, get_own_address
+
 
 class Election:
     """
@@ -25,7 +26,7 @@ class Election:
         self.fund_addr = "12345"
         self.redis_client = redis.Redis(host='localhost', port=6379, db=0)
         self.redis_client.hmset('fund '+self.fund_addr, {'total fund': 00})
-        self.this_node_addr = get_own_ip()
+        self.this_node_addr = get_own_address()
         self.stakes_map = dict()
         self.votes_map = dict()
         self.verification = Verification()
@@ -65,7 +66,7 @@ class Election:
         while True:
             select = arr[random.randint(0, total_stake-1)]
             if (select != self.this_node_addr):
-                break     
+                break
 
         self.votes_map[self.this_node_addr] = select
         print("This nodes vote :")
@@ -80,7 +81,8 @@ class Election:
         context = zmq.Context()
         z2socket = context.socket(zmq.REQ)
         z2socket.connect("tcp://0.0.0.0:%s" % settings.BROADCAST_ZMQ_PORT)
-        z2socket.send_string(json.dumps({'data':{"voter_addr":self.this_node_addr, "voted_addr":select},'command': 'voteto'}))
+        z2socket.send_string(json.dumps({'data': {
+                             "voter_addr": self.this_node_addr, "voted_addr": select}, 'command': 'voteto'}))
         message = z2socket.recv()
         print(message)
         z2socket.close()

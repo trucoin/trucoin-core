@@ -1,6 +1,7 @@
 import socket
 from urllib.error import URLError
 import urllib.request
+import json
 
 def get_own_ip():
     try:
@@ -10,6 +11,13 @@ def get_own_ip():
     except URLError as e:
         hostname = socket.gethostname()
         return socket.gethostbyname(hostname)
+
+def get_own_address():
+    read_file = open("node_data.json", "r")
+    raw = read_file.read()
+    my_node = json.loads(raw)
+
+    return my_node["address"]
 
 def handle_network_error(e: URLError):
     if hasattr(e, 'reason'):
