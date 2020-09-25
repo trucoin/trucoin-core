@@ -42,7 +42,7 @@ class Election:
         for tx in txs:
             for output in tx.outputs:
                 if output.address == self.fund_addr:
-                    if tx.inputs > 0:
+                    if len(tx.inputs) > 0:
                         pipe.hincrbyfloat(
                             "stakes_map", tx.inputs[0].address, output.value)
         pipe.execute()
