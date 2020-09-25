@@ -62,6 +62,8 @@ class Election:
             return
         select = arr[random.randint(0, total_stake-1)]
         self.votes_map[self.this_node_addr] = select
+        print("This nodes vote :")
+        print(select)
         UDPHandler.castvote(json.dumps(
             {"node_addr": self.this_node_addr, "representative": select}))
 
