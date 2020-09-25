@@ -54,12 +54,14 @@ class Election:
     def elect_delegate(self):
         total_stake = 0
         arr = []
+        select = ""
         for key, val in self.stakes_map.items():
             total_stake += int(val)
             for i in range(0, int(val)):
                 arr.append(key)
         if total_stake == 0:
             return
+
         while True:
             select = arr[random.randint(0, total_stake-1)]
             if (select != self.this_node_addr):
