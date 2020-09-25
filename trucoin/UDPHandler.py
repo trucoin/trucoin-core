@@ -117,7 +117,6 @@ class UDPHandler:
 
     def sendblock(self, request=None, response=None):
         print(request)
-        print(response)
         if request is not None:
             UDPHandler.broadcastmessage(json.dumps({
                 "command": "sendblock",

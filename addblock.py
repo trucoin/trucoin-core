@@ -54,7 +54,7 @@ if __name__ == "__main__":
 
     redis_client = redis.Redis(host='localhost', port=6379, db=0)
     # Clean the whole database
-    redis_client.flushall()
+    redis_client.delete("chain")
 
     # Add genesis block
     redis_client.rpush("chain", json.dumps({
@@ -81,7 +81,7 @@ if __name__ == "__main__":
         "size": 1949
     }))
 
-    for i in range(0):
+    for i in range(1):
         block = Block()
         block.add_previous_block()
         block.add_transaction(create_fake_transaction(
@@ -92,4 +92,5 @@ if __name__ == "__main__":
         block.calcalute_block_size()
         redis_client.rpush("chain", json.dumps(block.to_json()))
         print(block.to_json())
-        UDPHandler.sendblock(block.to_json())
+        udphandler = UDPHandler()
+        udphandler.sendblock(block.to_json())

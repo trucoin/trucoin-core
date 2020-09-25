@@ -105,7 +105,6 @@ def electionworker():
     is_del = False
     if dels.count(elec.this_node_addr) > 0:
         is_del = True
-        mining()
     if is_del == False:
         add_block_nondel()
     while True:
