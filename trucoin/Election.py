@@ -19,6 +19,7 @@ class Election:
         This class holds the nodes election every 30 seconds. A miner is being chosen
         from a list of primary representative.
     """
+    votes_map = dict()
 
     def __init__(self):
         self.primary_representatives = dict()
@@ -28,7 +29,6 @@ class Election:
         self.redis_client.hmset('fund '+self.fund_addr, {'total fund': 00})
         self.this_node_addr = get_own_address()
         self.stakes_map = dict()
-        self.votes_map = dict()
         self.verification = Verification()
         # self.load_election_fund_details()
 
@@ -91,13 +91,15 @@ class Election:
 
     def add_vote(self, vote):
         print(vote)
-        self.votes_map[self.this_node_addr] = vote["representative"]
+        self.votes_map[vote["node_addr"]] = vote["representative"]
+        print(self.votes_map)
 
     def def_value(self): 
         return 0
 
     def delegates(self):
         votes_count = defaultdict(self.def_value)
+        print(self.votes_map)
         for key, val in self.votes_map.items():
             print(val)
             votes_count[val] += 1

@@ -108,15 +108,17 @@ def electionworker():
         is_del = True
     if is_del == False:
         add_block_nondel()
-    while True:
-        mining = Mining()
-        block = mining.create_block()
-        if block is not None:
-            UDPHandler.broadcastmessage(json.dumps({
-                "command": "sendblock",
-                "body": block.to_json()
-            }))
-        time.sleep(30)
+    else:
+        mining()
+    # while True:
+    #     mining = Mining()
+    #     block = mining.create_block()
+    #     if block is not None:
+    #         UDPHandler.broadcastmessage(json.dumps({
+    #             "command": "sendblock",
+    #             "body": block.to_json()
+    #         }))
+    #     time.sleep(30)
 
 
 def add_block_nondel():
