@@ -90,11 +90,15 @@ class Election:
         return
 
     def add_vote(self, vote):
-        self.votes_map.update(vote)
+        self.votes_map[self.this_node_addr] = vote["representative"]
+
+    def def_value(self): 
+        return 0
 
     def delegates(self):
-        votes_count = defaultdict(int)
+        votes_count = defaultdict(self.def_value)
         for key, val in self.votes_map.items():
+            print(val)
             votes_count[val] += 1
         votes_count = sorted(votes_count.items(),
                              key=lambda kv: (kv[1], kv[0]))

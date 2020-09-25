@@ -140,7 +140,8 @@ def add_block_nondel():
     if len(all_blocks) > 0:
         mr = []
         for blk in all_blocks:
-            mr.append(blk.merkle_root)
+            print(blk)
+            mr.append(blk["merkle_root"])
         # run full blockchain verif
         blkc = BlockChain()
         Mblock = bestblock(mr)
