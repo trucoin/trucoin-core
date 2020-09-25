@@ -93,7 +93,7 @@ class UDPHandler:
             socket.connect("tcp://127.0.0.1:%s" %
                             settings.ELECTION_ZMQ_PORT)
             print("recieving vote")
-            socket.send_string(json.dumps(response))
+            socket.send_string(json.dumps(response["body"]))
             msg = socket.recv()
             print(msg)
 

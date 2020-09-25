@@ -90,6 +90,7 @@ class Election:
         return
 
     def add_vote(self, vote):
+        print(vote)
         self.votes_map[self.this_node_addr] = vote["representative"]
 
     def def_value(self): 
