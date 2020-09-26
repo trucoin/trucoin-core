@@ -186,10 +186,14 @@ def add_block_nondel():
         for blk in all_blocks:
             print("Getting the most common Block ...")
             mr.append(blk["merkle_root"])
-        # Run full blockchain verification
+        # Add the most common block
         blkc = BlockChain()
         Mblock = bestblock(mr)
         blkc.add_block(Mblock)
+        # Initializing Election Class
+        elec = Election()
+        # full Blockchain verify
+        # elec.verification.full_chain_verify()
 
 def run_thread():
     # Main function to run threads

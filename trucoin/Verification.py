@@ -65,6 +65,8 @@ class Verification:
             v_merkl_root = block.merkle_root
             if v_merkl_root != raw["merkle_root"]: 
                 verify_message = "failed"
+                self.del_from_faultblock(i)
+                # sync chain
         verify_message = "verified"
         return verify_message
     
