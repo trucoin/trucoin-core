@@ -54,32 +54,32 @@ if __name__ == "__main__":
 
     redis_client = redis.Redis(host='localhost', port=6379, db=0)
     # Clean the whole database
-    redis_client.delete("chain")
+    # redis_client.delete("chain")
 
     # Add genesis block
-    redis_client.rpush("chain", json.dumps({
-        "hash": "16e8dab3a9185d5329fac9cfdc0a81c7817826f701e747cb3751878061e4dc8c",
-        "timestamp": 1599401715.846563,
-        "transactions": [{
-            "timestamp": 1599401715.846347,
-            "version": "0.0.1",
-            "inputs": [],
-            "outputs": [
-                {
-                    "value": 50,
-                    "n": 0,
-                    "address": addr
-                }
-            ],
-            "hash": "eef9fda50a6bf6c11c5078d8772d94df4f60ce54573c009f145eb047426ad0fb",
-            "block": "16e8dab3a9185d5329fac9cfdc0a81c7817826f701e747cb3751878061e4dc8c"
-        }],
-        "previous_block_hash": "",
-        "merkle_root": "78bc90dcc3fe2ae1eca8b9d4e09b63653cd18f0b583e002b2b4d43cc09fca9cd",
-        "height": 0,
-        "version": "0.0.1",
-        "size": 1949
-    }))
+    # redis_client.rpush("chain", json.dumps({
+    #     "hash": "16e8dab3a9185d5329fac9cfdc0a81c7817826f701e747cb3751878061e4dc8c",
+    #     "timestamp": 1599401715.846563,
+    #     "transactions": [{
+    #         "timestamp": 1599401715.846347,
+    #         "version": "0.0.1",
+    #         "inputs": [],
+    #         "outputs": [
+    #             {
+    #                 "value": 50,
+    #                 "n": 0,
+    #                 "address": addr
+    #             }
+    #         ],
+    #         "hash": "eef9fda50a6bf6c11c5078d8772d94df4f60ce54573c009f145eb047426ad0fb",
+    #         "block": "16e8dab3a9185d5329fac9cfdc0a81c7817826f701e747cb3751878061e4dc8c"
+    #     }],
+    #     "previous_block_hash": "",
+    #     "merkle_root": "78bc90dcc3fe2ae1eca8b9d4e09b63653cd18f0b583e002b2b4d43cc09fca9cd",
+    #     "height": 0,
+    #     "version": "0.0.1",
+    #     "size": 1949
+    # }))
 
     for i in range(1):
         block = Block()
