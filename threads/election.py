@@ -56,7 +56,7 @@ def worker():
     zpoll.register(zsocket)
     start_timestamp = time.time()
     # Time to wait for others's votes
-    while time.time() - start_timestamp < 5:
+    while time.time() - start_timestamp < 10:
         events = dict(zpoll.poll(1))
         for key in events:
             vote = json.loads(key.recv_string())
@@ -92,14 +92,14 @@ def mining():
             # Exit if tx is None
             break
         # Get tx verification verdict 
-        verify_verdict = elec.verification.verify_tx(tx)
-        if verify_verdict == "verified":
-            # Sending data to block
-            blk.add_transaction(tx)
-        else:
-            vd = False
-            print("Some Transaction Verification Failed! Aborting Mining ...")
-            break
+        # verify_verdict = elec.verification.verify_tx(tx)
+        # if verify_verdict == "verified":
+        #     # Sending data to block
+        #     blk.add_transaction(tx)
+        # else:
+        #     vd = False
+        #     print("Some Transaction Verification Failed! Aborting Mining ...")
+        #     break
     # If Tx Verification Fails
     if vd == False:
         print("Mining Aborted!")
