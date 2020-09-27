@@ -179,7 +179,7 @@ def add_block_nondel():
     zpoll.unregister(zsocket)
     zsocket.close()
     context.destroy()
-    print("Recieved " + len(all_blocks) + " Blocks!")
+    print("Recieved " + str(len(all_blocks)) + " Blocks!")
     # Get most common and add to chain
     if len(all_blocks) > 0:
         mr = []
