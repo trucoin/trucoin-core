@@ -198,6 +198,7 @@ def add_block_nondel():
 def run_thread():
     # Main function to run threads
     print("Starting Election/Mining rocess")
-    t = threading.Thread(target=electionworker)
-    t.start()
-    t.join()
+    while True:
+        t = threading.Thread(target=electionworker)
+        t.start()
+        t.join()
