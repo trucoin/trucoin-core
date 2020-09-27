@@ -68,7 +68,7 @@ if __name__ == "__main__":
                 {
                     "value": 50,
                     "n": 0,
-                    "address": "1d3f347aada53547142da8edea5e0019e6ef31bb15"
+                    "address": addr
                 }
             ],
             "hash": "eef9fda50a6bf6c11c5078d8772d94df4f60ce54573c009f145eb047426ad0fb",
