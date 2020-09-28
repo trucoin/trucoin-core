@@ -11,6 +11,7 @@ from os import path
 
 class Node:
     def __init__(self):
+        print("Node-DNS conversation...")
         self.dns_fetch()
         self.dns_push()
 

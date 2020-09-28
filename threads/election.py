@@ -5,6 +5,7 @@ from trucoin.Verification import Verification
 from trucoin.Transaction import Transaction
 from trucoin.Election import Election
 from trucoin.Block import Block
+from trucoin.Node import Node
 import json
 from collections import defaultdict
 import random
@@ -195,8 +196,43 @@ def add_block_nondel():
         # full Blockchain verify
         # elec.verification.full_chain_verify()
 
+def memsync():
+    ip_address = utils.get_own_ip()
+    print("Mempool sync started ...")
+    redis_client = redis.Redis(host='localhost', port=6379, db=0)
+    ip_list = []
+    ip_list.append(ip_address)
+
+    nodes_map = utils.decode_redis(redis_client.hgetall("nodes_map"))
+    
+    for ip_addr, raw_data in nodes_map.items():
+        if ip_addr == ip_address:
+            continue
+        else:
+            ip_list.append(ip_addr)
+
+    print("Nodes list : " + str(ip_list))
+
+    ip_list.sort()
+    length = len(ip_list)
+    ask = ""
+    for i in range(0,length):
+        if ip_list[i] == ip_address:
+            if i == (length - 1):
+                ask = ip_list[0]
+            else:
+                ask = ip_list[i+1]
+
+    print("Starting mempool transaction sync ...")
+    # UDP command to ask from ask 
+    
+
+
 def run_thread():
     # Main function to run threads
+    Node()
+    # run mempool sync
+    memsync()
     print("Starting Election/Mining rocess")
     while True:
         t = threading.Thread(target=electionworker)
