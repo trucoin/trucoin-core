@@ -13,7 +13,7 @@ class Sync:
         ip=self.fetch_nodes()
         if ip is not None:
             udp = UDPHandler()
-            udp.synctime(json.loads({'ip_addr':ip}))
+            udp.synctime({"ip_addr":ip})
             redis_client = redis.Redis(host='localhost', port=6379, db=0)
             while not 'delay_time' in redis_client.keys('*'):
                 time.sleep(2)
@@ -32,9 +32,10 @@ class Sync:
                 raw = response.read()
                 result = json.loads(raw.decode("utf-8"))
                 for value in result['nodes']:
-                    if value['ip_addr'] == own_ip or value['ip_addr'] == settings.EXPLORER_IP:
+                    if value['ip_addr'] == own_ip or value['ip_addr'] == settings.EXPLORER_IP[0]:
                         continue
-                    return value['ip_addr']
+                    else:
+                        return value['ip_addr']
                     break
 
 

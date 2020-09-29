@@ -47,7 +47,7 @@ class UDPHandler:
         udpsock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         udpsock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         udpsock.bind((host, port))
-        udpsock.sendto(message.encode('utf-8'), (sender_ip, sender_port))
+        udpsock.sendto(message.encode('utf-8'), (sender_ip, int(sender_port)))
         udpsock.close()
 
     @staticmethod
@@ -210,6 +210,7 @@ class UDPHandler:
 
     def synctime(self, request=None, response=None):
         if response is None:
+            print(request['ip_addr'])
             UDPHandler.sendmessage(json.dumps({
                 "command": "synctime",
                 "body":{"timestamp": time.time()}
