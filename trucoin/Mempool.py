@@ -21,7 +21,21 @@ class Mempool:
         self.redis_client.rpush("mempool", json.dumps(val.to_json()))
         print("added tx")
         return True
-    
+
+    def sync_transaction(self, res):
+        i = 0 
+        flag = 0
+        while True:
+            tx = self.redis_client.lindex("mempool", i)
+            if tx == None:
+                break
+            if tx["hash"] == res["hash"]:
+                flag = 1
+                break
+            i = i + 1
+        if flag == 0:
+            self.redis_client.rpush("mempool", json.dumps(res))
+
     def get_len(self):
         return self.redis_client.llen("mempool")
 

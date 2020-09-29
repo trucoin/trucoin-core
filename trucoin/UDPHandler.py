@@ -32,6 +32,7 @@ class UDPHandler:
             "gettime": self.gettime,
             "ping": self.pingpong,
             "getspace": self.get_disk_space,
+            "synctx": self.synctx
         }
 
     @staticmethod
@@ -196,6 +197,16 @@ class UDPHandler:
             mempool = Mempool()
             mempool.add_transaction(
                 Transaction.from_json(json.loads(response)["tx"]))
+
+    def synctx(self, request=None, response=None):
+        if response is None:
+            UDPHandler.sendmessage(json.dumps({
+                "command": "synctx",
+                "tx": request["body"]
+            }), request["ip_addr"])
+        else:
+            mempool = Mempool()
+            mempool.sync_transaction(Transaction.from_json(json.loads(response)["tx"]))
 
     def synctime(self, request=None, response=None):
         if response is None:
