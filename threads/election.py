@@ -215,26 +215,45 @@ def memsync():
 
     ip_list.sort()
     length = len(ip_list)
-    ask = ""
+    send = ""
+
+    if length == 0:
+        print("NO NODES ACTIVE TO SYNC WITH!!!")
+        return
+
     for i in range(0,length):
         if ip_list[i] == ip_address:
-            if i == (length - 1):
-                ask = ip_list[0]
+            if i == 0:
+                send = ip_list[-1]
             else:
-                ask = ip_list[i+1]
+                send = ip_list[i-1]
 
     print("Starting mempool transaction sync ...")
-    # UDP command to ask from ask 
-    
+    # UDP command to send txs to prev addr
+    i = 0
+    while True:
+        tx = redis_client.lindex("mempool", i)
+        if tx == None:
+            break
+        udp = UDPHandler()
+        print("Sending transaction for sync " + str(i) + "....")
+        udp.synctx(({
+            "body": tx,
+            "ip_addr": send
+        }))
+        i = i + 1
 
+    time.sleep(1)
+    print("Mempool sync finished!!!")
 
 def run_thread():
-    # Main function to run threads
-    Node()
-    # run mempool sync
-    memsync()
-    print("Starting Election/Mining rocess")
+    print("Starting Election thread ...")
     while True:
+        print("Starting Election/Mining rocess ...")
+        # Main function to run threads
+        Node()
+        # run mempool sync
+        memsync()
         t = threading.Thread(target=electionworker)
         t.start()
         t.join()
