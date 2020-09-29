@@ -98,11 +98,50 @@ class UDPHandler:
             msg = socket.recv()
             print(msg)
 
-    def getchainlength(self, data):
-        return self.redis_client.llen("chain")
+    def getchainlength(self, request=None, response=None):
+        if request is not None:
+            UDPHandler.sendmessage(json.dumps({
+                "command": "getchainlength",
+                "body": ""
+            }), request["ip_addr"])
+        else:
+            if "command" in response.keys():
+                ln = self.redis_client.llen("chain")
+                UDPHandler.sendmessage(json.dumps({
+                    "prev_command": "getchainlength",
+                    "data": ln
+                }), response["ip_addr"])
+            elif "prev_command" in response.keys():
+                context = zmq.Context()
+                socket = context.socket(zmq.REQ)
+                socket.connect("tcp://127.0.0.1:%s" %
+                               settings.SYNC_ZMQ_PORT)
+                socket.send_string(json.dumps(response))
+                msg = socket.recv()
+                print(msg)
 
-    def getblockbyheight(self, data):
-        return self.redis_client.lindex('chain', data["height"]).decode("utf-8")
+
+    def getblockbyheight(self, request=None, response=None):
+        if request is not None:
+            UDPHandler.sendmessage(json.dumps({
+                "command": "getblockbyheight",
+                "height": request["height"]
+            }), request["ip_addr"])
+        else:
+            if "command" in response.keys():
+                blk = self.redis_client.lindex('chain', response["height"]).decode("utf-8")
+                UDPHandler.sendmessage(json.dumps({
+                    "prev_command": "getblockbyheight",
+                    "data": blk
+                }), response["ip_addr"])
+            elif "prev_command" in response.keys():
+                context = zmq.Context()
+                socket = context.socket(zmq.REQ)
+                socket.connect("tcp://127.0.0.1:%s" %
+                               settings.SYNC_ZMQ_PORT)
+                socket.send_string(json.dumps(response))
+                msg = socket.recv()
+                print(msg)
 
     def getmempoollength(self, data):
         mm = Mempool()

@@ -6,6 +6,7 @@ from trucoin.Transaction import Transaction
 from trucoin.Election import Election
 from trucoin.Block import Block
 from trucoin.Node import Node
+from trucoin.Sync import Sync
 import json
 from collections import defaultdict
 import random
@@ -196,56 +197,6 @@ def add_block_nondel():
         # full Blockchain verify
         # elec.verification.full_chain_verify()
 
-def memsync():
-    ip_address = utils.get_own_ip()
-    print("Mempool sync started ...")
-    redis_client = redis.Redis(host='localhost', port=6379, db=0)
-    ip_list = []
-    ip_list.append(ip_address)
-
-    nodes_map = utils.decode_redis(redis_client.hgetall("nodes_map"))
-    
-    for ip_addr, raw_data in nodes_map.items():
-        if ip_addr == ip_address:
-            continue
-        else:
-            ip_list.append(ip_addr)
-
-    print("Nodes list : " + str(ip_list))
-
-    ip_list.sort()
-    length = len(ip_list)
-    send = ""
-
-    if length == 0:
-        print("NO NODES ACTIVE TO SYNC WITH!!!")
-        return
-
-    for i in range(0,length):
-        if ip_list[i] == ip_address:
-            if i == 0:
-                send = ip_list[-1]
-            else:
-                send = ip_list[i-1]
-
-    print("Starting mempool transaction sync ...")
-    # UDP command to send txs to prev addr
-    i = 0
-    while True:
-        tx = redis_client.lindex("mempool", i)
-        if tx == None:
-            break
-        udp = UDPHandler()
-        print("Sending transaction for sync " + str(i) + "....")
-        udp.synctx(({
-            "body": tx,
-            "ip_addr": send
-        }))
-        i = i + 1
-
-    time.sleep(1)
-    print("Mempool sync finished!!!")
-
 def run_thread():
     print("Starting Election thread ...")
     while True:
@@ -253,7 +204,9 @@ def run_thread():
         # Main function to run threads
         Node()
         # run mempool sync
-        memsync()
+        sync = Sync()
+        sync.memsync()
+        # chainsync()
         t = threading.Thread(target=electionworker)
         t.start()
         t.join()
