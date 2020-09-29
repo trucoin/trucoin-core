@@ -20,9 +20,11 @@ class Sync:
             udp = UDPHandler()
             udp.synctime({"ip_addr":ip})
             redis_client = redis.Redis(host='localhost', port=6379, db=0)
-            while not redis_client.get('delay_time'):
+            while  redis_client.exists('delay_time'):
                 time.sleep(2)
                 print("syncing time")
+                if redis_client.exists('delay_time'):
+                    break
             print('time synced')
         print("server synced")
 
