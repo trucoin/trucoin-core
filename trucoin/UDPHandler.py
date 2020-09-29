@@ -238,6 +238,8 @@ class UDPHandler:
         if response is not None:
             raw = json.loads(response)
             redis_client = redis.Redis(host='localhost', port=6379, db=0)
+            ts.set_time(int(float(response["body"]["timestamp"])) +
+                        int(float(redis_client.get("delay_time").decode("ascii"))))
             
 
     def pingpong(self, request=None, response=None):
