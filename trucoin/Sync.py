@@ -6,18 +6,19 @@ import urllib
 import json
 from urllib.error import URLError
 from trucoin.UDPHandler import UDPHandler
+import redis
 class Sync:
 
-    def sync_server(self):
-        print("Sycing node with nodes")
-        message={
-            "command":"echo",
-            "time":time.time()
-        }
-        udp = UDPHandler()
+    def sync_server(self,ip=None):
         ip=self.fetch_nodes()
-        if ip:
-            udp.sendmessage(message,ip)
+        if ip is not None:
+            udp = UDPHandler()
+            udp.synctime({'ip_addr':ip,"receiver_port":settings.UDP_RECEIVER_PORT})
+            redis_client = redis.Redis(host='localhost', port=6379, db=0)
+            while not 'delay_time' in redis_client.keys('*'):
+                print("syncing time")
+            print('time synced')
+        print("server synced")
 
     def fetch_nodes(self):
         own_ip = get_own_ip()

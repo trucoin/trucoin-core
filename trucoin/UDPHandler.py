@@ -201,14 +201,22 @@ class UDPHandler:
         if response is None:
             UDPHandler.sendmessage(json.dumps({
                 "command": "synctime",
-                "timestamp": time.time()
+                "body":{"timestamp": time.time()}
             }), request["ip_addr"], request["receiver_port"])
         else:
-            raw = json.loads(response)
-            redis_client = redis.Redis(host='localhost', port=6379, db=0)
-            current_timestamp = time.time()
-            redis_client.set(
-                "delay_time", (current_timestamp - int(raw["timestamp"])) / 2)
+            if "prev_command" in response.keys():
+                raw = json.loads(response)
+                redis_client = redis.Redis(host='localhost', port=6379, db=0)
+                current_timestamp = time.time()
+                redis_client.set(
+                    "delay_time", (current_timestamp - int(raw['body']["timestamp"])) / 2)
+            else:
+                raw= json.loads(response)
+                UDPHandler.sendmessage(json.dumps({
+                "prev_command":"synctime",
+                "body":{"timestamp":raw['body']['body']}
+                }))
+            
 
     def gettime(self, request=None, response=None):
         ts = TimeServer()
