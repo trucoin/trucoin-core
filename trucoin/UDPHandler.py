@@ -262,24 +262,33 @@ class UDPHandler:
                 print((current_timestamp - int(float(response['body']["timestamp"]))) / 2)
                 redis_client.set(
                     "delay_time", (int(current_timestamp) - int(float(response['body']["timestamp"]))) / 2)
-                ts.set_time(int(float(response["body"]["timestamp"])) +
+                ts.set_time(int(float(response["body"]["time"])) +
                         int(float(redis_client.get("delay_time").decode("ascii"))))
                 
             else:
                 UDPHandler.sendmessage(json.dumps({
                 "prev_command":"synctime",
-                "body":{"timestamp":response['body']['timestamp']}
+                "body":{"timestamp":response['body']['timestamp'],'time':time.time()}
                 }), response["ip_addr"])
-            
+                
 
     def gettime(self, request=None, response=None):
         ts = TimeServer()
-        if response is not None:
-            raw = json.loads(response)
-            redis_client = redis.Redis(host='localhost', port=6379, db=0)
-            ts.set_time(int(float(response["body"]["timestamp"])) +
-                        int(float(redis_client.get("delay_time").decode("ascii"))))
-            
+        if response is None:
+            UDPHandler.sendmessage(json.dumps({
+                "command":"gettime"
+            }),request['ip_addr'])
+        else:
+            if "prev_command" in data.keys():
+                raw = json.loads(response)
+                redis_client = redis.Redis(host='localhost', port=6379, db=0)
+                ts.set_time(int(float(response["body"]["timestamp"])) +
+                            int(float(redis_client.get("delay_time").decode("ascii"))))
+            else:
+                UDPHandler.sendmessage(json.dumps({
+                    "prev_command":"gettime",
+                    "body":{"timestamp":time.time()}
+                }),request['ip_addr'])
 
     def pingpong(self, request=None, response=None):
         if response is not None:
