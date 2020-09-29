@@ -13,9 +13,10 @@ class Sync:
         ip=self.fetch_nodes()
         if ip is not None:
             udp = UDPHandler()
-            udp.synctime({'ip_addr':ip,"receiver_port":settings.UDP_RECEIVER_PORT})
+            udp.synctime(json.loads({'ip_addr':ip}))
             redis_client = redis.Redis(host='localhost', port=6379, db=0)
             while not 'delay_time' in redis_client.keys('*'):
+                time.sleep(2)
                 print("syncing time")
             print('time synced')
         print("server synced")

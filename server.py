@@ -17,11 +17,12 @@ from threads.election import run_thread
 from trucoin.Address import Address
 from threads.storage import start
 from trucoin.Node import Node
+from trucoin.Sync import Sync
 
 # Defining host and port to run the main server on
 host = '0.0.0.0'
 port = 8080
-
+sync = Sync()
 def cpu_count():
     """ Returns CPU count and software compatibility """
     cpucount = os.cpu_count()
@@ -32,12 +33,16 @@ def cpu_count():
 
 def run_threads():
     """ running multiple processes """
-    # RPC
-    rpc=multiprocessing.Process(target=rpc_receive)
-    rpc.start()
     # Receiver
     receiver=multiprocessing.Process(target=broadcast_receive)
     receiver.start()
+
+    sync.sync_server()
+    # RPC
+    rpc=multiprocessing.Process(target=rpc_receive)
+    rpc.start()
+
+    
     # Election & Mining
     election_process = multiprocessing.Process(target=run_thread)
     election_process.start()

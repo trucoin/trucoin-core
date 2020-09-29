@@ -202,20 +202,24 @@ class UDPHandler:
             UDPHandler.sendmessage(json.dumps({
                 "command": "synctime",
                 "body":{"timestamp": time.time()}
-            }), request["ip_addr"], request["receiver_port"])
+            }), request["ip_addr"])
         else:
             if "prev_command" in response.keys():
                 raw = json.loads(response)
+                ts=TimeServer()
                 redis_client = redis.Redis(host='localhost', port=6379, db=0)
                 current_timestamp = time.time()
                 redis_client.set(
                     "delay_time", (current_timestamp - int(raw['body']["timestamp"])) / 2)
+                ts.set_time(int(raw["timestamp"]) +
+                        int(redis_client.get("delay_time")))
+                
             else:
                 raw= json.loads(response)
                 UDPHandler.sendmessage(json.dumps({
                 "prev_command":"synctime",
                 "body":{"timestamp":raw['body']['body']}
-                }))
+                }), response["ip_addr"])
             
 
     def gettime(self, request=None, response=None):
@@ -223,8 +227,7 @@ class UDPHandler:
         if response is not None:
             raw = json.loads(response)
             redis_client = redis.Redis(host='localhost', port=6379, db=0)
-            ts.set_time(int(raw["timestamp"]) +
-                        int(redis_client.get("delay_time")))
+            
 
     def pingpong(self, request=None, response=None):
         if response is not None:
