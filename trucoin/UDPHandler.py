@@ -279,7 +279,7 @@ class UDPHandler:
                 "command":"gettime"
             }),request['ip_addr'])
         else:
-            if "prev_command" in data.keys():
+            if "prev_command" in response.keys():
                 raw = json.loads(response)
                 redis_client = redis.Redis(host='localhost', port=6379, db=0)
                 ts.set_time(int(float(response["body"]["timestamp"])) +

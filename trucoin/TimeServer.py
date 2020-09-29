@@ -12,7 +12,7 @@ class TimeServer:
         subprocess.call(shlex.split("sudo date -s '%s'" % time_string))
         subprocess.call(shlex.split("sudo hwclock -w"))
 
-    def set_time(self, timestamp):
+    def set_time(self, timestamp:float):
         time_obj = datetime.fromtimestamp(timestamp)
 
         time_tuple1 = (time_obj.year, #year
