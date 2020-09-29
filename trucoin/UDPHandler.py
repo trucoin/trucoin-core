@@ -223,7 +223,7 @@ class UDPHandler:
                 redis_client.set(
                     "delay_time", (current_timestamp - int(response['body']["timestamp"])) / 2)
                 ts.set_time(int(response["body"]["timestamp"]) +
-                        int(redis_client.get("delay_time")))
+                        int(redis_client.get("delay_time").decode("ascii")))
                 
             else:
                 UDPHandler.sendmessage(json.dumps({
