@@ -220,8 +220,9 @@ class UDPHandler:
                 ts=TimeServer()
                 redis_client = redis.Redis(host='localhost', port=6379, db=0)
                 current_timestamp = time.time()
+                print((current_timestamp - int(float(response['body']["timestamp"]))) / 2)
                 redis_client.set(
-                    "delay_time", (current_timestamp - int(float(response['body']["timestamp"]))) / 2)
+                    "delay_time", (int(current_timestamp) - int(float(response['body']["timestamp"]))) / 2)
                 ts.set_time(int(float(response["body"]["timestamp"])) +
                         int(float(redis_client.get("delay_time").decode("ascii"))))
                 
