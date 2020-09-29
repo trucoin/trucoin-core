@@ -6,7 +6,7 @@ class TimeServer:
         import subprocess
         import shlex
 
-        time_string = datetime(*time_tuple).isoformat()
+        time_string = time_tuple.isoformat()
 
         subprocess.call(shlex.split("timedatectl set-ntp false")) # For Centos7/RHEL
         subprocess.call(shlex.split("sudo date -s '%s'" % time_string))
@@ -14,7 +14,7 @@ class TimeServer:
 
     def set_time(self, timestamp:float):
         time_obj = datetime.fromtimestamp(timestamp)
-
+        print(time_obj)
         time_tuple1 = (time_obj.year, #year
                       time_obj.month,   # Month
                       time_obj.day,   # Day
@@ -23,4 +23,4 @@ class TimeServer:
                       time_obj.second,   # Second
                       time_obj.microsecond / 1000, )  # Millisecond
         if sys.platform == 'linux':
-            self.linux_set_time(time_tuple1)
+            self.linux_set_time(time_obj)
