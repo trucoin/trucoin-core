@@ -5,6 +5,7 @@ from utils import handle_network_error,get_own_ip
 import urllib
 import json
 from urllib.error import URLError
+from trucoin.UDPHandler import UDPHandler
 class Sync:
 
     def sync_server(self):
@@ -13,20 +14,11 @@ class Sync:
             "command":"echo",
             "time":time.time()
         }
-        host = '0.0.0.0'
-        port = settings.UDP_BROADCAST_PORT
-        udpsock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        udpsock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        udpsock.bind((host, port))
+        udp = UDPHandler()
         ip=self.fetch_nodes()
         if ip:
-            udpsock.sendto(message.encode('utf-8'), (ip, settings.UDP_RECEIVER_PORT))
-            sock= socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
-            sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            sock.bind((host, settings.UDP_RECEIVER_PORT))  
-            data, client_address = self.sock.recvfrom(4096) 
+            udp.sendmessage(message,ip)
 
-        udpsock.close()
     def fetch_nodes(self):
         own_ip = get_own_ip()
         for url in settings.DNS_SERVERS:

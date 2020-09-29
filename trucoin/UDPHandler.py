@@ -31,7 +31,7 @@ class UDPHandler:
             "synctime": self.synctime,
             "gettime": self.gettime,
             "ping": self.pingpong,
-            "getspace": self.get_disk_space
+            "getspace": self.get_disk_space,
         }
 
     @staticmethod
@@ -230,3 +230,4 @@ class UDPHandler:
                 "prev_command": "ping",
                 "body": {"reply": "pong"}
             }), request["ip_addr"])
+  
