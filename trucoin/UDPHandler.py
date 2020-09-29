@@ -217,20 +217,18 @@ class UDPHandler:
             }), request["ip_addr"])
         else:
             if "prev_command" in response.keys():
-                raw = json.loads(response)
                 ts=TimeServer()
                 redis_client = redis.Redis(host='localhost', port=6379, db=0)
                 current_timestamp = time.time()
                 redis_client.set(
-                    "delay_time", (current_timestamp - int(raw['body']["timestamp"])) / 2)
-                ts.set_time(int(raw["timestamp"]) +
+                    "delay_time", (current_timestamp - int(response['body']["timestamp"])) / 2)
+                ts.set_time(int(response["body"]["timestamp"]) +
                         int(redis_client.get("delay_time")))
                 
             else:
-                raw= json.loads(response)
                 UDPHandler.sendmessage(json.dumps({
                 "prev_command":"synctime",
-                "body":{"timestamp":raw['body']['body']}
+                "body":{"timestamp":response['body']['timestamp']}
                 }), response["ip_addr"])
             
 
