@@ -267,11 +267,11 @@ class UDPHandler:
         if response is None:
             UDPHandler.sendmessage(json.dumps({
                 "command": "synctx",
-                "tx": request["body"]
+                "body": request["body"]
             }), request["ip_addr"])
         else:
             mempool = Mempool()
-            mempool.sync_transaction(Transaction.from_json(json.loads(response)["tx"]))
+            mempool.sync_transaction(Transaction.from_json(json.loads(response)["body"]))
 
     def synctime(self, request=None, response=None):
         if response is None:
