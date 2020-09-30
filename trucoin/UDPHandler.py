@@ -143,13 +143,35 @@ class UDPHandler:
                 msg = socket.recv()
                 print(msg)
 
-    def getmempoollength(self, data):
-        mm = Mempool()
-        return mm.get_len()
+    def getmempoollength(self, request=None, response=None):
+        if request is not None:
+            UDPHandler.sendmessage(json.dumps({
+                "command": "getmempoollength",
+                "body": ""
+            }), request["ip_addr"])
+        else:
+            if "command" in response.keys():
+                mm = Mempool()
+                ln = mm.get_len()
+                UDPHandler.sendmessage(json.dumps({
+                    "prev_command": "getmempoollength",
+                    "data": ln
+                }), response["ip_addr"])
 
-    def gettxbymindex(self, data):
-        mm = Mempool()
-        return mm.get_tx_by_mindex(data["body"].index)
+    def gettxbymindex(self, request=None, response=None):
+        if request is not None:
+            UDPHandler.sendmessage(json.dumps({
+                "command": "gettxbymindex",
+                "body": request["index"]
+            }), request["ip_addr"])
+        else:
+            if "command" in response.keys():
+                mm = Mempool()
+                tx = mm.get_tx_by_mindex(response["body"])
+                UDPHandler.sendmessage(json.dumps({
+                    "prev_command": "gettxbymindex",
+                    "data": tx
+                }), response["ip_addr"])
 
     def sendtransaction(self, request=None, response=None):
         # tx = Transaction.from_json(data['body'])
