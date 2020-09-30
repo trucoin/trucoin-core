@@ -92,7 +92,7 @@ class Sync:
             return
         elif mylen < length:
             for i in range(mylen, length):
-                udp.getblockbyheight({"height": i, "ip_addr": ip})
+                udp.getblockbyheight(json.dumps({"height": i, "ip_addr": ip}))
                 socket.connect("tcp://127.0.0.1:%s" %
                                     settings.SYNC_ZMQ_PORT)
                 res = json.loads(socket.recv_string())
@@ -147,8 +147,8 @@ class Sync:
                 break
             udp = UDPHandler()
             print("Sending transaction for sync " + str(i) + "....")
-            udp.synctx(({
-                "body": tx,
+            udp.synctx(json.dumps({
+                "body": tx.decode(),
                 "ip_addr": send
             }))
             i = i + 1
