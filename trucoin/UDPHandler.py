@@ -271,7 +271,7 @@ class UDPHandler:
             }), request["ip_addr"])
         else:
             mempool = Mempool()
-            mempool.sync_transaction(Transaction.from_json(json.loads(response)["body"]))
+            mempool.sync_transaction(json.loads(response["body"]))
 
     def synctime(self, request=None, response=None):
         if response is None:

@@ -25,14 +25,16 @@ class Mempool:
     def sync_transaction(self, res):
         i = 0 
         flag = 0
-        while True:
-            tx = self.redis_client.lindex("mempool", i)
+        mempool_length = self.redis_client.llen("mempool")
+        while mempool_length > 0:
+            tx = json.loads(self.redis_client.lindex("mempool", mempool_length-1).decode())
             if tx == None:
                 break
             if tx["hash"] == res["hash"]:
                 flag = 1
                 break
             i = i + 1
+            mempool_length -= 1
         if flag == 0:
             self.redis_client.rpush("mempool", json.dumps(res))
 
