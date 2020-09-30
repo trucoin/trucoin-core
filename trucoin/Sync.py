@@ -67,7 +67,7 @@ class Sync:
         socket.connect("tcp://127.0.0.1:%s" %
                                 settings.SYNC_ZMQ_PORT)
         res = json.loads(socket.recv_string())
-        length = res["data"]
+        length = res["body"]
         socket.send_string("Recieved Chain Length")
         socket.close()
 
@@ -82,7 +82,7 @@ class Sync:
                 socket.send_string("Recieved a block of the chain!!!")
                 socket.close()
                 blchain = Blockchain()
-                blchain.add_block(res["data"])
+                blchain.add_block(res["body"])
             # chain verification
             verf = Verification()
             msg = verf.full_chain_verify()
@@ -101,7 +101,7 @@ class Sync:
                 socket.send_string("Recieved a block of the chain!!!")
                 socket.close()
                 blchain = BlockChain()
-                blchain.add_block(res["data"])
+                blchain.add_block(res["body"])
             # chain verification
             verf = Verification()
             msg = verf.full_chain_verify()

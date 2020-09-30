@@ -23,7 +23,6 @@ class Mempool:
         return True
 
     def sync_transaction(self, res):
-        i = 0 
         flag = 0
         mempool_length = self.redis_client.llen("mempool")
         while mempool_length > 0:
@@ -33,9 +32,9 @@ class Mempool:
             if tx["hash"] == res["hash"]:
                 flag = 1
                 break
-            i = i + 1
             mempool_length -= 1
         if flag == 0:
+            print(".....adding recieved tx to mempool on sync.....")
             self.redis_client.rpush("mempool", json.dumps(res))
 
     def get_len(self):

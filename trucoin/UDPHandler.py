@@ -71,6 +71,7 @@ class UDPHandler:
         udpsock.close()
 
     def command_handler(self, data):
+        print(data)
         if "command" in data.keys():
             if "body" in data.keys():
                 self.command_mapping[data['command']](None, data)
@@ -109,7 +110,7 @@ class UDPHandler:
                 ln = self.redis_client.llen("chain")
                 UDPHandler.sendmessage(json.dumps({
                     "prev_command": "getchainlength",
-                    "data": ln
+                    "body": ln
                 }), response["ip_addr"])
             elif "prev_command" in response.keys():
                 context = zmq.Context()
@@ -125,14 +126,14 @@ class UDPHandler:
         if request is not None:
             UDPHandler.sendmessage(json.dumps({
                 "command": "getblockbyheight",
-                "height": request["height"]
+                "body": request["height"]
             }), request["ip_addr"])
         else:
             if "command" in response.keys():
-                blk = self.redis_client.lindex('chain', response["height"]).decode("utf-8")
+                blk = self.redis_client.lindex('chain', response["body"]).decode("utf-8")
                 UDPHandler.sendmessage(json.dumps({
                     "prev_command": "getblockbyheight",
-                    "data": blk
+                    "body": blk
                 }), response["ip_addr"])
             elif "prev_command" in response.keys():
                 context = zmq.Context()
