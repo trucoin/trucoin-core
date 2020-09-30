@@ -52,6 +52,8 @@ class Sync:
         nodes_map = utils.decode_redis(redis_client.hgetall("nodes_map"))
         
         for ip_addr, raw_data in nodes_map.items():
+            if ip_addr in settings.EXPLORER_IP:
+                continue
             ip_list.append(ip_addr)
 
         # IP chosing method is under development!
@@ -117,6 +119,8 @@ class Sync:
         
         for ip_addr, raw_data in nodes_map.items():
             if ip_addr == ip_address:
+                continue
+            if ip_addr in settings.EXPLORER_IP:
                 continue
             else:
                 ip_list.append(ip_addr)
