@@ -10,6 +10,7 @@ import json
 from urllib.error import URLError
 from trucoin.UDPHandler import UDPHandler
 from trucoin.BlockChain import BlockChain
+from trucoin.Verification import Verification
 import redis
 
 class Sync:
@@ -53,6 +54,7 @@ class Sync:
         for ip_addr, raw_data in nodes_map.items():
             ip_list.append(ip_addr)
 
+        # IP chosing method is under development!
         ip = random.choice(ip_list)
 
         udp = UDPHandler()
@@ -80,9 +82,12 @@ class Sync:
                 blchain = Blockchain()
                 blchain.add_block(res["data"])
             # chain verification
-
+            verf = Verification()
+            msg = verf.full_chain_verify()
+            if msg != "verified":
+                return self.chainsync()
         elif mylen > length:
-            self.chainsync()
+            return self.chainsync()
         elif mylen == length:
             return
         elif mylen < length:
@@ -96,6 +101,10 @@ class Sync:
                 blchain = BlockChain()
                 blchain.add_block(res["data"])
             # chain verification
+            verf = Verification()
+            msg = verf.full_chain_verify()
+            if msg != "verified":
+                return self.chainsync()
 
     def memsync(self):
         ip_address = utils.get_own_ip()

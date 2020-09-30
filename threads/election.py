@@ -16,6 +16,7 @@ import redis
 import threading
 import urllib.request
 import settings
+import multiprocessing
 from trucoin.UDPHandler import UDPHandler
 import utils
 from trucoin.Mining import Mining
@@ -117,6 +118,8 @@ def mining():
     # check
     # full Blockchain verify
     # full_verify_message = elec.verification.full_chain_verify()
+    # if msg != "verified":
+    #    return sync.chainsync()
     # if full_verify_message == "verified":
         # braodcast the block you made
     print("Broadcasting block made by this node ...")
@@ -194,8 +197,11 @@ def add_block_nondel():
         blkc.add_block(Mblock)
         # Initializing Election Class
         elec = Election()
+        sync = Sync()
         # full Blockchain verify
-        # elec.verification.full_chain_verify()
+        # msg = elec.verification.full_chain_verify()
+        # if msg != "verified":
+        #    return sync.chainsync()
 
 def run_thread():
     print("Starting Election thread ...")
@@ -205,8 +211,22 @@ def run_thread():
         Node()
         # run mempool sync
         sync = Sync()
+        print("\n...MEMPOOL SYNC STARTED...")
         sync.memsync()
-        # chainsync()
+        print("...MEMPOOL SYNC DONE...\n")
+        
         t = threading.Thread(target=electionworker)
         t.start()
         t.join()
+        
+        p = multiprocessing.Process(target=sync.chainsync)
+        print("\n...CHAIN SYNC...")
+        p.start()
+        print("...SYNCING...")
+        p.join(5)
+        if p.is_alive():
+            p.terminate()
+            print("...CHAIN SYNC TERMINATED...\n")
+            p.join()
+
+

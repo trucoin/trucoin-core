@@ -58,6 +58,8 @@ class Verification:
 
     def full_chain_verify(self):
         verify_message = "unverified"
+        if self.chain_length == 0:
+            return "Empty Chain! Verification failed!"
         for i in range(0, self.chain_length):
             raw = json.loads(self.redis_client.lindex('chain', i).decode('utf-8'))
             block = Block.from_json(raw)
@@ -66,7 +68,7 @@ class Verification:
             if v_merkl_root != raw["merkle_root"]: 
                 verify_message = "failed"
                 self.del_from_faultblock(i)
-                # sync chain
+                return verify_message
         verify_message = "verified"
         return verify_message
     
