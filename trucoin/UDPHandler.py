@@ -179,7 +179,7 @@ class UDPHandler:
         if response is not None:
             if "command" in response.keys():
                 mm = Mempool()
-                mm.add_transaction(response["tx"])
+                mm.add_transaction(response["body"])
 
     def sendblock(self, request=None, response=None):
         print(request)
