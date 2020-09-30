@@ -52,6 +52,8 @@ class Sync:
         nodes_map = utils.decode_redis(redis_client.hgetall("nodes_map"))
         
         for ip_addr, raw_data in nodes_map.items():
+            if ip_addr in settings.EXPLORER_IP:
+                continue
             ip_list.append(ip_addr)
 
         # IP chosing method is under development!
@@ -92,7 +94,7 @@ class Sync:
             return
         elif mylen < length:
             for i in range(mylen, length):
-                udp.getblockbyheight(({"height": i, "ip_addr": ip}))
+                udp.getblockbyheight({"height": i, "ip_addr": ip})
                 socket.connect("tcp://127.0.0.1:%s" %
                                     settings.SYNC_ZMQ_PORT)
                 res = json.loads(socket.recv_string())
@@ -117,6 +119,8 @@ class Sync:
         
         for ip_addr, raw_data in nodes_map.items():
             if ip_addr == ip_address:
+                continue
+            if ip_addr in settings.EXPLORER_IP:
                 continue
             else:
                 ip_list.append(ip_addr)
@@ -147,10 +151,10 @@ class Sync:
                 break
             udp = UDPHandler()
             print("Sending transaction for sync " + str(i) + "....")
-            udp.synctx(({
+            udp.synctx({
                 "body": tx.decode(),
                 "ip_addr": send
-            }))
+            })
             i = i + 1
 
         time.sleep(1)
