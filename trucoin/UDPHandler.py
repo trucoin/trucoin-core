@@ -176,7 +176,10 @@ class UDPHandler:
     def sendtransaction(self, request=None, response=None):
         # tx = Transaction.from_json(data['body'])
         # UDPHandler.broadcastmessage(json.dumps(tx.to_json()))
-        pass
+        if response is not None:
+            if "command" in response.keys():
+                mm = Mempool()
+                mm.add_transaction(response["tx"])
 
     def sendblock(self, request=None, response=None):
         print(request)

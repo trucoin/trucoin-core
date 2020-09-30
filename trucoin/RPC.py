@@ -50,7 +50,7 @@ class RPC:
         
         UDPHandler.broadcastmessage(json.dumps({
             "command": "sendtransaction",
-            "tx": tx.to_json()
+            "body": tx.to_json()
         }))
         return json.dumps({
             "status": "ok"
