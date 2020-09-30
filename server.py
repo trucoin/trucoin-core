@@ -64,6 +64,7 @@ def node_start():
     node = Node()
     # get cpu data
     cpu_count()
+    sync.chainsync()
     # start processes
     run_threads()
     
