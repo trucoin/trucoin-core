@@ -148,7 +148,7 @@ class Sync:
             udp = UDPHandler()
             print("Sending transaction for sync " + str(i) + "....")
             udp.synctx(({
-                "body": tx,
+                "body": json.dumps(tx.decode()),
                 "ip_addr": send
             }))
             i = i + 1
