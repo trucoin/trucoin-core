@@ -12,6 +12,7 @@ from trucoin.Mempool import Mempool
 from trucoin.Block import Block
 from trucoin.UDPHandler import UDPHandler
 
+# Defining hosts and ports
 host = '0.0.0.0'
 port = settings.UDP_RECEIVER_PORT
 sock= socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
@@ -19,6 +20,7 @@ sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 sock.bind((host, port))
 INVALID_DATA=False
 
+# Handling incoming response through UDP
 def response_handler(data):
     udp = UDPHandler()
     udp.command_handler(data)
@@ -26,10 +28,10 @@ def response_handler(data):
 class UDPBroadcastReceiveServer():
     sock=sock    # Socket
     def printwt(self, msg):
-
         ''' Print message with current date and time '''
         current_date_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         print(f'[{current_date_time}] {msg}')
+
     def configure_server(self):
         self.printwt('Creating socket...')
         self.printwt('Socket created')
@@ -37,8 +39,6 @@ class UDPBroadcastReceiveServer():
         self.printwt(f' Broadcasting and Receiving Server binded to {host}:{port}')
 
     def shutdown_server(self):
-
-
         ''' Shutdown the UDP server '''
         self.printwt('Shutting down server...')
         self.sock.close()

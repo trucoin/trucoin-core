@@ -22,9 +22,12 @@ from trucoin.Sync import Sync
 # Defining host and port to run the main server on
 host = '0.0.0.0'
 port = 8080
+# Initializing sync class
 sync = Sync()
+
 def cpu_count():
     """ Returns CPU count and software compatibility """
+
     cpucount = os.cpu_count()
     print("total cpu cores in the system=",cpucount)
     if cpucount < 2:
@@ -33,16 +36,14 @@ def cpu_count():
 
 def run_threads():
     """ running multiple processes """
+
     # Receiver
     receiver=multiprocessing.Process(target=broadcast_receive)
     receiver.start()
-
     sync.sync_server()
     # RPC
     rpc=multiprocessing.Process(target=rpc_receive)
     rpc.start()
-
-    
     # Election & Mining
     election_process = multiprocessing.Process(target=run_thread)
     election_process.start()
@@ -51,7 +52,7 @@ def run_threads():
     storage_process.start()
 
 def node_start():
-    """ root method """
+    """ main server method """
 
     # Storage folder creation
     curr_dir = os.getcwd()
@@ -67,8 +68,6 @@ def node_start():
     # sync.chainsync()
     # start processes
     run_threads()
-    
-
 
 if __name__ == '__main__':
     node_start()

@@ -39,7 +39,6 @@ def bestblock(merkle_roots=[]):
             print(key)
             return key
 
-
 def worker():
     # Initializing Election Class
     elec = Election()
@@ -214,11 +213,12 @@ def run_thread():
         print("\n...MEMPOOL SYNC STARTED...")
         sync.memsync()
         print("...MEMPOOL SYNC DONE...\n")
-        
+        # Start Election Process
         t = threading.Thread(target=electionworker)
         t.start()
         t.join()
-        
+        # Chain sync method
+        # Function not to be used here currently
         p = multiprocessing.Process(target=sync.chainsync)
         print("\n...CHAIN SYNC...")
         p.start()

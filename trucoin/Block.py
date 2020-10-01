@@ -36,6 +36,7 @@ class Block:
 
     def add_transaction(self, transaction: Transaction):
         """ Adding a new transaction """
+
         self.transactions.append(transaction)
 
     def to_json(self):
@@ -120,7 +121,6 @@ class Block:
                 h.update(
                     ((transactions[i]) + (transactions[i+1])).encode("UTF-8"))
                 new_tran.append(h.hexdigest())
-
         if len(new_tran) == 1:
             self.merkle_root = new_tran[0]
             return
@@ -129,6 +129,7 @@ class Block:
             self.calculate_merkle_root(new_tran)
 
     def create_coinbase_transaction(self):
+        # Adds coinbase transaction to each mined block
         tx = Transaction()
         output = TransactionOutput()
         read_file = open("node_data.json", "r")
