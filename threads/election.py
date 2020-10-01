@@ -11,6 +11,7 @@ import json
 from collections import defaultdict
 import random
 import zmq
+from os import system
 import time
 import redis
 import threading
@@ -228,5 +229,6 @@ def run_thread():
             p.terminate()
             print("...CHAIN SYNC TERMINATED...\n")
             p.join()
+        system('clear')
 
 

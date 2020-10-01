@@ -23,7 +23,7 @@ if __name__ == '__main__':
                 'address': 'bb4c10de221933bb0aa1ab1897f5640592fc1fa4'
             }
         ],
-        'hash': 'eef9fda50a6bf6c11c5078d8772d94df4f60ce54573c009f145eb047426ad0fb',
+        'hash': 'eef9fda50a6besdrhyaeeeeeeeeee5072d94df4f6sfrhdztrhewrhyf145eb047426ad0fb',
         'block': 'testchain',
         'is_coinbase': False
     }

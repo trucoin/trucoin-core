@@ -53,7 +53,7 @@ class UDPServerMultiClient(UDPBroadcastReceiveServer):
         # handle request
         data = data.decode('utf-8')
         self.printwt(f'[ REQUEST from {client_address} ]')
-        print('\n', data, '\n')
+        # print('\n', data, '\n')
         response = response_handler({
             "ip_addr": client_address[0],
             **json.loads(data)

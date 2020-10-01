@@ -91,6 +91,6 @@ if __name__ == "__main__":
         block.compute_hash()
         block.calcalute_block_size()
         redis_client.rpush("chain", json.dumps(block.to_json()))
-        print(block.to_json())
+        # print(block.to_json())
         udphandler = UDPHandler()
         udphandler.sendblock(block.to_json())
