@@ -13,30 +13,33 @@ from trucoin.BlockChain import BlockChain
 from trucoin.Block import Block
 from utils import decode_redis, get_own_ip
 
-
 class UDPHandler:
+    """ UDP Command Handler Class """
 
     def __init__(self):
         self.redis_client = redis.Redis(host='localhost', port=6379, db=0)
+        # Conmmand Mapping
         self.command_mapping = {
             "castvote": self.castvote,
+            "ping": self.pingpong,
             "getchainlength": self.getchainlength,
             "getblockbyheight": self.getblockbyheight,
             "getmempoollength": self.getmempoollength,
+            "gettime": self.gettime,
+            "getspace": self.get_disk_space,
             "gettxbymindex": self.gettxbymindex,
-            "sendtransaction": self.sendtransaction,
-            "sendblock": self.sendblock,
             "getallmtxhash": self.getallmtxhash,
             "gettxbyhash": self.gettxbyhash,
+            "sendtransaction": self.sendtransaction,
+            "sendblock": self.sendblock,
             "synctime": self.synctime,
-            "gettime": self.gettime,
-            "ping": self.pingpong,
-            "getspace": self.get_disk_space,
             "synctx": self.synctx
         }
 
     @staticmethod
     def sendmessage(message, sender_ip):
+        """ This method is to send message to some manual IP """
+
         redis_client = redis.Redis(host='localhost', port=6379, db=0)
         raw = redis_client.hget("nodes_map", sender_ip)
         sender_port = settings.UDP_RECEIVER_PORT
@@ -52,6 +55,8 @@ class UDPHandler:
 
     @staticmethod
     def broadcastmessage(message):
+        """ This method is to broadcast message to all IPs """
+
         own_ip = get_own_ip()
         host = '0.0.0.0'
         port = settings.UDP_BROADCAST_PORT
@@ -60,36 +65,51 @@ class UDPHandler:
         udpsock.bind((host, port))
         redis_client = redis.Redis(host='localhost', port=6379, db=0)
         nodes_map = decode_redis(redis_client.hgetall("nodes_map"))
-        print(nodes_map)
+        # print(nodes_map)
         for ip_addr, raw_data in nodes_map.items():
             if ip_addr == own_ip:
                 continue
             data = json.loads(raw_data)
-            print(data)
+            # print(data)
             udpsock.sendto(message.encode('utf-8'),
                            (ip_addr, int(data["receiver_port"])))
         udpsock.close()
 
     def command_handler(self, data):
-        print(data)
+        """ Main Command Handler """
+
+        # If receiving a command
         if "command" in data.keys():
             if "body" in data.keys():
+                # If data is present in with command
                 self.command_mapping[data['command']](None, data)
             else:
+                # If data is absent 
                 self.command_mapping[data['command']](None, None)
+
+        # If replying to a command
         elif "prev_command" in data.keys():
             if "body" in data.keys():
+                # If data is present in previous command
                 self.command_mapping[data['prev_command']](None, data)
             else:
+                # If data is absent
                 self.command_mapping[data['prev_command']](None, None)
 
     def castvote(self, request=None, response=None):
-        if request is not None:
+        """ Casting Vote for election """
+
+        if request is None and response is None:
+            # If no data is being passed on by command handler
+            pass
+        elif request is not None:
+            # Processing requests 
             self.broadcastmessage(json.dumps({
                 "prev_command": "castvote",
                 "body": request
             }))
-        if response is not None:
+        elif response is not None:
+            # Processing reaponse
             context = zmq.Context()
             socket = context.socket(zmq.REQ)
             socket.connect("tcp://127.0.0.1:%s" %
@@ -99,13 +119,40 @@ class UDPHandler:
             msg = socket.recv()
             print(msg)
 
-    def getchainlength(self, request=None, response=None):
+    def pingpong(self, request=None, response=None):
+        """ UDP ping pong """
+
+        if request is None and response is None:
+            # If no data is being passed on by command handler
+            pass
         if request is not None:
+            # Processing requests
+            # print(request)
+            self.sendmessage(json.dumps({
+                "prev_command": "ping",
+                "body": {"reply": "pong"}
+            }), request["ip_addr"])
+        if response is not None:
+            # Processing reaponse
+            self.sendmessage(json.dumps({
+                "prev_command": "ping",
+                "body": {"reply": "pong"}
+            }), response["ip_addr"])
+
+    def getchainlength(self, request=None, response=None):
+        """ Get length of Blockchain """
+
+        if request is None and response is None:
+            # If no data is being passed on by command handler
+            pass
+        if request is not None:
+            # Processing requests 
             UDPHandler.sendmessage(json.dumps({
                 "command": "getchainlength",
                 "body": ""
             }), request["ip_addr"])
-        else:
+        if response is not None:
+            # Processing reaponse
             if "command" in response.keys():
                 ln = self.redis_client.llen("chain")
                 UDPHandler.sendmessage(json.dumps({
@@ -123,12 +170,19 @@ class UDPHandler:
 
 
     def getblockbyheight(self, request=None, response=None):
+        """ Get block by height """
+
+        if request is None and response is None:
+            # If no data is being passed on by command handler
+            pass
         if request is not None:
+            # Processing requests 
             UDPHandler.sendmessage(json.dumps({
                 "command": "getblockbyheight",
                 "body": request["height"]
             }), request["ip_addr"])
-        else:
+        if response is not None:
+            # Processing reaponse
             if "command" in response.keys():
                 blk = self.redis_client.lindex('chain', response["body"]).decode("utf-8")
                 UDPHandler.sendmessage(json.dumps({
@@ -145,12 +199,19 @@ class UDPHandler:
                 print(msg)
 
     def getmempoollength(self, request=None, response=None):
+        """ Get length of Mempool """
+
+        if request is None and response is None:
+            # If no data is being passed on by command handler
+            pass
         if request is not None:
+            # Processing requests
             UDPHandler.sendmessage(json.dumps({
                 "command": "getmempoollength",
                 "body": ""
             }), request["ip_addr"])
-        else:
+        if response is not None:
+            # Processing reaponse
             if "command" in response.keys():
                 mm = Mempool()
                 ln = mm.get_len()
@@ -160,12 +221,19 @@ class UDPHandler:
                 }), response["ip_addr"])
 
     def gettxbymindex(self, request=None, response=None):
+        """ Get Mempool transaction by index """
+
+        if request is None and response is None:
+            # If no data is being passed on by command handler
+            pass
         if request is not None:
+            # Processing requests
             UDPHandler.sendmessage(json.dumps({
                 "command": "gettxbymindex",
                 "body": request["index"]
             }), request["ip_addr"])
-        else:
+        if response is not None:
+            # Processing reaponse
             if "command" in response.keys():
                 mm = Mempool()
                 tx = mm.get_tx_by_mindex(response["body"])
@@ -175,33 +243,50 @@ class UDPHandler:
                 }), response["ip_addr"])
 
     def sendtransaction(self, request=None, response=None):
-        # tx = Transaction.from_json(data['body'])
-        # UDPHandler.broadcastmessage(json.dumps(tx.to_json()))
+        """ Send transaction """
+
+        if request is None and response is None:
+            # If no data is being passed on by command handler
+            pass
         if response is not None:
+            # Processing reaponse
             if "command" in response.keys():
                 mm = Mempool()
                 tx = Transaction()
                 mm.add_transaction(tx.from_json(response["body"]))
 
     def sendblock(self, request=None, response=None):
-        print(request)
+        """ Send block """
+        
+        if request is None and response is None:
+            # If no data is being passed on by command handler
+            pass
         if request is not None:
+            # Processing requests
             UDPHandler.broadcastmessage(json.dumps({
                 "prev_command": "sendblock",
                 "body": request
             }))
         if response is not None:
+            # Processing reaponse
             blkc = BlockChain()
             blkc.add_block(Block.from_json(response["body"]))
             blkc.close()
 
     def get_disk_space(self, request=None, response=None):
+        """ Ask for disk space """
+
+        if request is None and response is None:
+            # If no data is being passed on by command handler
+            pass
         if request is not None:
+            # Processing requests
             UDPHandler.broadcastmessage(json.dumps({
                 "command": "getspace",
                 "body": {}
             }))
         if response is not None:
+            # Processing reaponse
             if "command" in response.keys():
                 curr_dir = os.getcwd()
                 print(curr_dir)
@@ -222,11 +307,18 @@ class UDPHandler:
                 print(msg)
 
     def getallmtxhash(self, request=None, response=None):
-        if response is None:
+        """ Get all mempool transactiona by hash """
+        
+        if request is None and response is None:
+            # If no data is being passed on by command handler
+            pass
+        if request is not None:
+            # Processing requests
             UDPHandler.broadcastmessage(json.dumps({
                 "command": "getallmtxhash"
             }))
-        else:
+        if response is not None:
+            # Processing reaponse
             redis_client = redis.Redis(host='localhost', port=6379, db=0)
             local_tx_hashes: set = set()
             remote_tx_hashes: set = set()
@@ -255,33 +347,54 @@ class UDPHandler:
                 })
 
     def gettxbyhash(self, request=None, response=None):
+        """ Get transaction by hash """
+
+        if request is None and response is None:
+            # If no data is being passed on by command handler
+            pass
         if request is not None:
+            # Processing requests
             UDPHandler.sendmessage(json.dumps({
                 "hash": request["hash"]
             }), request["ip_addr"], request["receiver_port"])
         elif response is not None:
+            # Processing reaponse
             mempool = Mempool()
             mempool.add_transaction(
                 Transaction.from_json(json.loads(response)["tx"]))
 
     def synctx(self, request=None, response=None):
-        if response is None:
+        """ Sync transaction command """
+
+        if request is None and response is None:
+            # If no data is being passed on by command handler
+            pass
+        if request is not None:
+            # Processing requests
             UDPHandler.sendmessage(json.dumps({
                 "command": "synctx",
                 "body": request["body"]
             }), request["ip_addr"])
-        else:
+        elif response is not None:
+            # Processing reaponse
             mempool = Mempool()
             mempool.sync_transaction(json.loads(response["body"]))
 
     def synctime(self, request=None, response=None):
-        if response is None:
+        """ Sync time command """
+
+        if request is None and response is None:
+            # If no data is being passed on by command handler
+            pass
+        if request is not None:
+            # Processing requests
             print(request['ip_addr'])
             UDPHandler.sendmessage(json.dumps({
                 "command": "synctime",
                 "body":{"timestamp": time.time()}
             }), request["ip_addr"])
-        else:
+        if response is not None:
+            # Processing reaponse
             if "prev_command" in response.keys():
                 ts=TimeServer()
                 redis_client = redis.Redis(host='localhost', port=6379, db=0)
@@ -291,7 +404,6 @@ class UDPHandler:
                     "delay_time", (int(current_timestamp) - int(float(response['body']["timestamp"]))) / 2)
                 ts.set_time(int(float(response["body"]["time"])) +
                         int(float(redis_client.get("delay_time").decode("ascii"))))
-                
             else:
                 UDPHandler.sendmessage(json.dumps({
                 "prev_command":"synctime",
@@ -300,12 +412,19 @@ class UDPHandler:
                 
 
     def gettime(self, request=None, response=None):
+        """ Get time """
+
         ts = TimeServer()
-        if response is None:
+        if request is None and response is None:
+            # If no data is being passed on by command handler
+            pass
+        if request is not None:
+            # Processing requests
             UDPHandler.sendmessage(json.dumps({
                 "command":"gettime"
             }),request['ip_addr'])
-        else:
+        if response is not None:
+            # Processing reaponse
             if "prev_command" in response.keys():
                 raw = json.loads(response)
                 redis_client = redis.Redis(host='localhost', port=6379, db=0)
@@ -317,16 +436,6 @@ class UDPHandler:
                     "body":{"timestamp":time.time()}
                 }),request['ip_addr'])
 
-    def pingpong(self, request=None, response=None):
-        if response is not None:
-            self.sendmessage(json.dumps({
-                "prev_command": "ping",
-                "body": {"reply": "pong"}
-            }), response["ip_addr"])
-        elif request is not None:
-            print(request)
-            self.sendmessage(json.dumps({
-                "prev_command": "ping",
-                "body": {"reply": "pong"}
-            }), request["ip_addr"])
+
+        
   
