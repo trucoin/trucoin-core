@@ -9,3 +9,5 @@ gflags/
 node_data.json
 storage/
 pythonenv3.8/
+rust/target
+rust/**/*.rs.bk
