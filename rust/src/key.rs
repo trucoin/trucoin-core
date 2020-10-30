@@ -3,26 +3,25 @@ extern crate rand;
 
 use rand::rngs::OsRng;
 use secp256k1::{Secp256k1, Message, SecretKey, PublicKey, Signature};
-// use std::collections::hash_map::DefaultHasher;
-// use std::hash::{Hash, Hasher};
+use std::collections::hash_map::DefaultHasher;
+use std::hash::{Hash, Hasher};
 
 pub struct Address {
     seck: String,
     // pubk: String,
 }
 
-
 impl Address {
 
-    // fn calculate_hash<T: Hash>(t: &T) -> u8 {
-    //     let mut s = DefaultHasher::new();
-    //     t.hash(&mut s);
-    //     s.finish()
-    // }
-
-    pub fn f(s: &[u8]) -> &[u8] {
-        &s
+    fn calculate_hash<T: Hash>(t: &T) -> u8 {
+        let mut s = DefaultHasher::new();
+        t.hash(&mut s);
+        s.finish()
     }
+
+    // pub fn f(s: &[u8]) -> &[u8] {
+    //     &s
+    // }
 
     pub fn gen_key() -> Address {
 
@@ -36,7 +35,7 @@ impl Address {
     pub fn sign_msg(&self, msg: String) -> String {
         let secp = Secp256k1::new();
         println!("{:?}", &msg.as_bytes());
-        let message = Message::from_slice(&Address::f(&msg.as_bytes())).expect("32 bytes");
+        let message = Message::from_slice(&Address::calculate_hash(&msg)).expect("32 bytes");
         let secret_key = SecretKey::from_slice(&self.seck.as_bytes()).expect("32 bytes, within curve order");
         let sig = secp.sign(&message, &secret_key);
 

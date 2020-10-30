@@ -1,6 +1,7 @@
-mod key;
+// mod key;
+mod block;
 
 fn main() {
     println!("Hello, world!");
-    key::key();
+    block::block_test();
 }
