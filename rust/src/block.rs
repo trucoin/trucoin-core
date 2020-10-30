@@ -13,6 +13,10 @@ pub struct Block {
     size: u64,
 }
 
+pub fn hex_string(input: &[u8]) -> String {
+    input.as_ref().iter().map(|b| format!("{:x}", b)).collect()
+}
+
 impl Block {
 
     //construct
@@ -28,8 +32,10 @@ impl Block {
         }
     }
 
+    
+
     pub fn add_prev_hsh(&mut self) {
-        self.hsh = String::from("jasffgajflhif")
+        self.prev_hsh = String::from("jasffgajflhif")
     }
 
     pub fn to_json(&self) -> String {
@@ -65,12 +71,14 @@ impl Block {
         // read hash digest and consume hasher
         let result = hasher.finalize();
 
-        self.hsh = result[..].to_string();
+        let hex = hex_string(&result);
+
+        self.hsh = hex;
     }
 }
 
 pub fn block_test() {
-    let mut blk = Block::new("", "1234", "", "mrkl", 90, "0.1.0", 234567);
+    let mut blk = Block::new("hsgh", "1234", "", "mrkl", 90, "0.1.0", 234567);
     blk.add_prev_hsh();
     blk.calc_hsh();
     let out = blk.to_json();
